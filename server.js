@@ -735,7 +735,7 @@ io.on("connection", (socket) => {
 
     const id = makeRoomId();
     const now = Date.now();
-    const token = Math.random().toString(36).slice(2, 12);   // 私房口令，仅双方持有
+    const token = crypto.randomBytes(16).toString("hex");   // 私房口令，仅双方持有
     const room = {
       id, pwd: token, name: me.name + " 的邀请对局", host: me.name,
       allowSpectate: false,
