@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <title>烽火棋-新手教程</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="assets/game.css">
+  <link rel="stylesheet" href="assets/level.css">
+</head>
+<style>
+  .lv-card[disabled] {
+    opacity: .42;
+    cursor: not-allowed;
+  }
+
+  .winjing-backtohall {
+    margin-top: 14px;
+    width: 100%;
+    padding: 11px;
+    border: none;
+    border-radius: 9px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    cursor: pointer;
+    color: #071018;
+    font-family: inherit;
+    background: linear-gradient(135deg, #7fd0ff, #4a9bff);
+    box-shadow: 0 4px 18px rgba(70, 150, 255, .5);
+    transition: transform .12s, box-shadow .12s;
+
+  }
+
+  .lv-card[disabled]:hover {
+    transform: none;
+    border-color: rgba(201, 168, 76, .25);
+  }
+
+  .tu-step {
+    font-size: 11px;
+    color: #c9a84c;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  .tu-brief {
+    max-width: 620px;
+    margin: 0 auto;
+    text-align: left;
+    font-size: 13px;
+    line-height: 1.95;
+    color: #d8ccb2;
+  }
+
+  .tu-brief b {
+    color: #ffd98a;
+  }
+
+  .tu-brief .row {
+    padding: 7px 0;
+    border-bottom: 1px dashed rgba(201, 168, 76, .18);
+  }
+
+  .tu-brief .row:last-child {
+    border-bottom: 0;
+  }
+
+  .tu-actions {
+    margin-top: 18px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .tu-actions button {
+    padding: 10px 22px;
+    border-radius: 9px;
+    border: 1px solid #c9a84c;
+    background: linear-gradient(180deg, #6b5527, #46351a);
+    color: #ffe9b8;
+    font-size: 14px;
+    letter-spacing: 2px;
+    cursor: pointer;
+  }
+
+  .tu-actions button.ghost {
+    background: transparent;
+    color: #c9a84c;
+  }
+
+  .tu-done {
+    font-size: 15px;
+    color: #7ee6a2;
+    letter-spacing: 2px;
+    margin: 10px 0 4px;
+  }
+
+  #fog {
+    top: 315px !important;
+    left: 18px !important;
+    width: 200px !important;
+  }
+</style>
+
+<body>
+  <div id="status" class="panel">
+    <h3>◈ 战局状态</h3>
+    <div class="turn-badge" id="turnBadge"><span class="turn-dot"></span>红方回合 · 第 1 回合</div>
+    <div class="count-row">
+      <div class="count-box red">
+        <div class="num" id="redCount">0</div>
+        <div class="lbl">红方棋子</div>
+      </div>
+      <div class="count-box blue">
+        <div class="num" id="blueCount">0</div>
+        <div class="lbl">蓝方棋子</div>
+      </div>
+    </div>
+    <div class="thresh">
+      <div><span class="tag" id="coreTag">≤26</span>核心进攻限制：<b id="coreState" style="color:#ff9b9e">生效中</b></div>
+      <div><span class="tag on">≤20</span>迷雾解除阈值：<b id="fogThreshState">待触发</b></div>
+      <div><span class="tag">步长</span>军棋步长　红<b id="genStepR">3</b>　蓝<b id="genStepB">3</b></div>
+    </div>
+  </div>
+
+  <div id="goalPanel" class="panel">
+    <h3>◈ 本课目标</h3>
+    <div class="tu-step" id="goalStep">第 1 / 5 课</div>
+    <div class="goal-name" id="goalName">—</div>
+    <div class="goal-label" id="goalLabel">—</div>
+    <div class="goal-bar"><i id="goalFill"></i></div>
+    <div class="goal-meta">
+      <span>进度 <b id="goalProg">0/0</b></span>
+      <span>剩余步数 <b id="goalLeft">—</b></span>
+    </div>
+    <div class="goal-hint" id="goalHint"></div>
+    <div class="cam-btns">
+      <button id="btnHint" class="ghost">提 示</button>
+      <button id="btnRetry">重 试</button>
+      <button id="btnPick" class="ghost">课 程</button>
+    </div>
+  </div>
+
+  <div id="fog" class="panel">
+    <h3>◈ 视野迷雾</h3>
+    <div class="fog-toggle">
+      <span class="fog-state" id="fogState">迷雾开启</span>
+      <div class="switch" id="fogSwitch"></div>
+    </div>
+    <div class="fog-hint" id="fogSides"><span class="fog-lamp"></span>红：迷雾　蓝：迷雾</div>
+    <div class="fog-hint">对方子棋阵亡 / 总数 ≤20 时解除</div>
+  </div>
+
+  <div id="legend" class="panel">
+    <h3>◈ 棋子图例</h3>
+    <div class="legend-grid" id="legendGrid"></div>
+  </div>
+
+  <div id="logpanel" class="panel">
+    <h3>◈ 操作记录</h3>
+    <ul class="log-list" id="logList"></ul>
+    <button class="winjing-backtohall" onclick="location.href='index.php'">回 到 大 厅</button>
+  </div>
+
+  <div id="board"></div>
+  <div id="aiThinking">对手思考中…</div>
+  <div id="lvOverlay">
+    <div class="lv-inner">
+      <h2 id="lvTitle">新 手 教 程</h2>
+      <div class="lv-sub" id="lvSub">五节小课，每节都有唯一解法，卡住了点「提示」</div>
+      <div id="lvBody"></div>
+    </div>
+  </div>
+  <div id="resOverlay" class="hidden">
+    <div class="res-inner">
+      <div class="res-card" id="resCard">过关</div>
+      <div class="res-why" id="resWhy"></div>
+      <div class="res-sub" id="resSub"></div>
+      <div class="res-btns">
+        <button id="resNext">下 一 课</button>
+        <button id="resRetry" class="ghost">重 试</button>
+        <button id="resPick" class="ghost">课 程</button>
+      </div>
+    </div>
+  </div>
+
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <radialGradient id="gRed" cx="35%" cy="28%" r="75%">
+        <stop offset="0%" stop-color="#ffd0c9" />
+        <stop offset="35%" stop-color="#ff6d6d" />
+        <stop offset="100%" stop-color="#8f1620" />
+      </radialGradient>
+      <radialGradient id="gBlue" cx="35%" cy="28%" r="75%">
+        <stop offset="0%" stop-color="#d5ecff" />
+        <stop offset="35%" stop-color="#5aa0ff" />
+        <stop offset="100%" stop-color="#153a86" />
+      </radialGradient>
+    </defs>
+  </svg>
+
+  <script src="assets/core/engine.js"></script>
+  <script src="assets/core/ui.js"></script>
+  <script src="assets/core/ai.js"></script>
+  <script src="assets/core/fen.js"></script>
+  <script src="assets/core/goal.js"></script>
+  <script src="assets/core/levels.js"></script>
+  <script src="assets/core/play.js"></script>
+  <script>
+    (function () {
+      "use strict";
+      var STORE = "fhq.tutorial.done";        // 教程进度
+      var FLAG = "fhq.newbie.asked";          // 首访问询已答
+      var COURSE = Levels.ofChapter(1);       // 教学关只取第 1 章
+      var engine = Engine.createGame();
+      var $ = function (id) { return document.getElementById(id); };
+
+      function loadDone() {
+        try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch (e) { return {}; }
+      }
+      function markDone(id) {
+        var d = loadDone(); d[id] = 1;
+        try { localStorage.setItem(STORE, JSON.stringify(d)); } catch (e) { }
+      }
+      function allDone() {
+        var d = loadDone();
+        for (var i = 0; i < COURSE.length; i++) if (!d[COURSE[i].id]) return false;
+        return COURSE.length > 0;
+      }
+      // 线性解锁
+      function unlockedCount() {
+        var d = loadDone(), n = 0;
+        while (n < COURSE.length && d[COURSE[n].id]) n++;
+        return Math.min(n + 1, COURSE.length);
+      }
+      function markGraduated() {
+        try { localStorage.setItem(FLAG, "1"); } catch (e) { }
+      }
+
+      /* ---------- 提示高亮 ---------- */
+      var hintEls = [];
+      function clearHint() {
+        for (var i = 0; i < hintEls.length; i++) {
+          if (hintEls[i].parentNode) hintEls[i].parentNode.removeChild(hintEls[i]);
+        }
+        hintEls = [];
+      }
+      function markCell(c, r, kind) {
+        var d = document.createElement("div");
+        d.className = "hint-mark " + kind;
+        d.style.left = (c * 100 / 30) + "%";
+        d.style.top = (r * 100 / 30) + "%";
+        d.style.width = (100 / 30) + "%";
+        d.style.height = (100 / 30) + "%";
+        $("board").appendChild(d);
+        hintEls.push(d);
+      }
+      function showHint() {
+        clearHint();
+        var step = runner.hint();
+        if (!step) {
+          $("goalHint").textContent = runner.hasSolution
+            ? "已经走出参考解法之外了，点「重试」可以从头再来。"
+            : (runner.task ? runner.task.hint : "");
+          return;
+        }
+        markCell(step.fc, step.fr, "from");
+        markCell(step.c, step.r, "to");
+        $("goalHint").textContent = "提示：走 (" + step.fc + "," + step.fr + ") → (" + step.c + "," + step.r + ")。";
+      }
+
+      /* ---------- 运行器 ---------- */
+      var runner = Play.createRunner({
+        engine: engine,
+        human: "red",
+        onThinking: function (on) { $("aiThinking").classList.toggle("on", on); },
+        onStart: function (t) {
+          clearHint();
+          var i = COURSE.indexOf(t.level);
+          $("goalStep").textContent = "第 " + (i + 1) + " / " + COURSE.length + " 课";
+          $("resOverlay").classList.add("hidden");
+          $("lvOverlay").classList.add("hidden");
+        },
+        onGoal: function (s, t) {
+          if (!s || !t) return;
+          clearHint();
+          $("goalName").textContent = t.name;
+          $("goalLabel").textContent = s.label;
+          $("goalHint").textContent = t.hint;
+          var pct = s.max > 0 ? Math.round((s.cur / s.max) * 100) : (s.done && s.win ? 100 : 0);
+          $("goalFill").style.width = pct + "%";
+          $("goalProg").textContent = s.cur + "/" + s.max;
+          var lf = $("goalLeft");
+          lf.textContent = s.movesLeft == null ? "不限" : String(s.movesLeft);
+          lf.className = (s.movesLeft != null && s.movesLeft <= 3) ? "low" : "";
+          var b = $("btnHint");
+          b.style.display = runner.hasSolution ? "" : "none";
+          b.disabled = !runner.hasSolution || runner.settled;
+        },
+        onSettle: function (s, t) {
+          clearHint();
+          if (s.win) markDone(t.level.id);
+          $("resCard").textContent = s.win ? "过 关" : "未 过 关";
+          $("resCard").className = "res-card " + (s.win ? "win" : "lose");
+          $("resWhy").textContent = s.reason || "";
+          $("resSub").textContent = s.label + "　·　进度 " + s.cur + "/" + s.max + "　·　用了 " + s.movesUsed + " 步";
+          var nxt = nextLevel();
+          $("resNext").textContent = nxt ? "下 一 课" : "完 成 教 程";
+          $("resNext").style.display = s.win ? "" : "none";
+          $("resOverlay").classList.remove("hidden");
+        },
+      });
+
+      var ui = UI.createUI({
+        engine: engine,
+        getViewer: function () { return "red"; },
+        canInteract: function (p) { return runner.canInteract(p); },
+        onMove: function (id, r, c) { return runner.handleMove(id, r, c); },
+        onRestart: function () { runner.retry(); },
+      });
+      runner.setUI(ui);
+
+      function nextLevel() {
+        var i = COURSE.indexOf(runner.task && runner.task.level);
+        return (i >= 0 && i + 1 < COURSE.length) ? COURSE[i + 1] : null;
+      }
+      function start(lv) {
+        if (!lv) return;
+        runner.run({
+          fen: lv.fen, goal: lv.goal, ai: lv.ai, solution: lv.solution || null,
+          name: lv.name, hint: lv.hint, level: lv,
+        });
+      }
+
+      /* ---------- 课程目录 ---------- */
+      function openPick() {
+        runner.stop();                            // 离开对局
+        var done = loadDone(), open = unlockedCount(), html = "";
+        html += '<div class="ch-desc">按顺序来，每节课都是一道必有解的小题。</div><div class="lv-grid">';
+        COURSE.forEach(function (lv, i) {
+          var locked = i >= open;
+          html += '<button class="lv-card" data-id="' + lv.id + '"' + (locked ? " disabled" : "") + '>' +
+            '<div class="n"><span>第 ' + (i + 1) + " 课 · " + lv.name + "</span>" +
+            '<span class="star' + (done[lv.id] ? " done" : "") + '">' +
+            (done[lv.id] ? "已过" : (locked ? "未解锁" : "未过")) + "</span></div>" +
+            '<div class="g">' + Goal.describe(lv.goal) + "</div></button>";
+        });
+        html += "</div>";
+        if (allDone()) {
+          html += '<div class="tu-done">✔ 教程已全部完成</div>' +
+            '<div class="tu-actions"><button id="tuHall">进 入 大 厅</button>' +
+            '<button id="tuEnd" class="ghost">去 残 局 挑 战</button></div>';
+        } else {
+          html += '<div class="tu-actions"><button id="tuSkip" class="ghost">我已有经验，跳过教程</button></div>';
+        }
+        $("lvTitle").textContent = "新 手 教 程";
+        $("lvSub").textContent = "五节小课，每节都有唯一解法，卡住了点「提示」";
+        $("lvBody").innerHTML = html;
+        Array.prototype.forEach.call($("lvBody").querySelectorAll(".lv-card"), function (b) {
+          if (b.disabled) return;
+          b.addEventListener("click", function () { start(Levels.byId(b.getAttribute("data-id"))); });
+        });
+        if ($("tuSkip")) $("tuSkip").addEventListener("click", function () {
+          markGraduated(); location.href = "index.php";
+        });
+        if ($("tuHall")) $("tuHall").addEventListener("click", function () {
+          markGraduated(); location.href = "index.php";
+        });
+        if ($("tuEnd")) $("tuEnd").addEventListener("click", function () {
+          markGraduated(); location.href = "endgame.html";
+        });
+        $("resOverlay").classList.add("hidden");
+        $("lvOverlay").classList.remove("hidden");
+      }
+
+      /* ---------- 开场说明 ---------- */
+      function openBrief() {
+        $("lvTitle").textContent = "欢 迎 来 到 烽 火 棋";
+        $("lvSub").textContent = "先花一分钟看完，再动手";
+        $("lvBody").innerHTML =
+          '<div class="tu-brief">' +
+          '<div class="row"><b>棋盘</b>　30×30，上半为红、下半为蓝，中间两行是<b>河</b>。' +
+          '双方各 20 枚棋子，本方最靠边的两行是<b>核心区</b>。</div>' +
+          '<div class="row"><b>目标</b>　吃掉对方母棋与子棋，且对方军棋+盾棋不超过 4 枚，即胜。</div>' +
+          '<div class="row"><b>迷雾</b>　开局只看得见自己的棋子和探棋照亮的地方。' +
+          '对方子棋阵亡、或全场棋子 ≤20 时，迷雾解除。</div>' +
+          '<div class="row"><b>行动权</b>　平时只有<b>探棋许可区</b>内的棋子能动（探棋走到哪，哪里就能动）；' +
+          '解雾之后全体自由行动。</div>' +
+          '<div class="row"><b>棋子</b>　母棋（帅，锁在核心区）· 子棋（继承人，死了就解雾）· ' +
+          '军棋（主力，能渡河）· 探棋（照明与开许可区）· 盾棋（只能从侧面吃）· 白板棋（复活兵）。</div>' +
+          '<div class="row">规则细节可以随时回大厅翻<b>规则书</b>，现在先从第一课开始。</div>' +
+          "</div>" +
+          '<div class="tu-actions"><button id="tuGo">开 始 第 一 课</button>' +
+          '<button id="tuList" class="ghost">看 课 程 目 录</button></div>';
+        $("tuGo").addEventListener("click", function () { start(COURSE[unlockedCount() - 1]); });
+        $("tuList").addEventListener("click", openPick);
+        $("resOverlay").classList.add("hidden");
+        $("lvOverlay").classList.remove("hidden");
+      }
+
+      $("btnHint").addEventListener("click", showHint);
+      $("btnRetry").addEventListener("click", function () { runner.retry(); });
+      $("btnPick").addEventListener("click", openPick);
+      $("resRetry").addEventListener("click", function () { runner.retry(); });
+      $("resPick").addEventListener("click", openPick);
+      $("resNext").addEventListener("click", function () {
+        var n = nextLevel();
+        if (n) start(n);
+        else { markGraduated(); openPick(); }
+      });
+
+      if (!COURSE.length) { $("lvBody").textContent = "课程数据缺失"; $("lvOverlay").classList.remove("hidden"); }
+      else if (allDone()) openPick();
+      else openBrief();
+    })();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,15 @@
+/node_modules/
+/vendor/
+/admin/logs/
+*.bak
+*.tmp
+*.tmp[0-9]*
+*.log
+update.zip
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~

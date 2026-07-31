@@ -1,0 +1,23 @@
+<FilesMatch "(^\.env|\.(env|bak|log|sql|lock|tmp[0-9]*)$)">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+<FilesMatch "^(composer|package|package-lock)\.json$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+RedirectMatch 403 ^/(cofd|vendor|phpmailer|node_modules)/
+RedirectMatch 403 ^/admin/lib/
+RedirectMatch 403 ^/admin/logs/
+Options -Indexes

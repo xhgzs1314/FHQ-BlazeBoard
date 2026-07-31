@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <title>烽火棋-残局挑战</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="assets/game.css">
+  <link rel="stylesheet" href="assets/level.css">
+  <link rel="stylesheet" href="assets/endgame.css">
+</head>
+<style>
+  .winjing-backtohall {
+    margin-top: 14px;
+    width: 100%;
+    padding: 11px;
+    border: none;
+    border-radius: 9px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    cursor: pointer;
+    color: #071018;
+    font-family: inherit;
+    background: linear-gradient(135deg, #7fd0ff, #4a9bff);
+    box-shadow: 0 4px 18px rgba(70, 150, 255, .5);
+    transition: transform .12s, box-shadow .12s;
+  }
+  ::-webkit-scrollbar{
+    width: 16px;
+    height: 16px;
+    color: #4a9bff;
+  }
+</style>
+<body>
+  <div id="status" class="panel">
+    <h3>◈ 战局状态</h3>
+    <div class="turn-badge" id="turnBadge"><span class="turn-dot"></span>红方回合 · 第 1 回合</div>
+    <div class="count-row">
+      <div class="count-box red">
+        <div class="num" id="redCount">0</div>
+        <div class="lbl">红方棋子</div>
+      </div>
+      <div class="count-box blue">
+        <div class="num" id="blueCount">0</div>
+        <div class="lbl">蓝方棋子</div>
+      </div>
+    </div>
+    <div class="thresh">
+      <div><span class="tag" id="coreTag">≤26</span>核心进攻限制：<b id="coreState" style="color:#ff9b9e">生效中</b></div>
+      <div><span class="tag on">≤20</span>迷雾解除阈值：<b id="fogThreshState">待触发</b></div>
+      <div><span class="tag">步长</span>军棋步长　红<b id="genStepR">3</b>　蓝<b id="genStepB">3</b></div>
+    </div>
+  </div>
+
+  <div id="goalPanel" class="panel">
+    <h3>◈ 残局目标</h3>
+    <div class="goal-name" id="goalName">—</div>
+    <div class="goal-label" id="goalLabel">—</div>
+    <div class="goal-bar"><i id="goalFill"></i></div>
+    <div class="goal-meta">
+      <span>进度 <b id="goalProg">0/0</b></span>
+      <span>剩余步数 <b id="goalLeft">—</b></span>
+    </div>
+    <div class="goal-hint" id="goalHint"></div>
+    <div class="cam-btns">
+      <button id="btnRetry">重 试</button>
+      <button id="btnPick" class="ghost">残 局 库</button>
+    </div>
+  </div>
+
+  <div id="fog" class="panel">
+    <h3>◈ 视野迷雾</h3>
+    <div class="fog-toggle">
+      <span class="fog-state" id="fogState">迷雾开启</span>
+      <div class="switch" id="fogSwitch"></div>
+    </div>
+    <div class="fog-hint" id="fogSides"><span class="fog-lamp"></span>红：迷雾　蓝：迷雾</div>
+    <div class="fog-hint">对方子棋阵亡 / 总数 ≤20 时解除</div>
+  </div>
+
+  <div id="legend" class="panel">
+    <h3>◈ 棋子图例</h3>
+    <div class="legend-grid" id="legendGrid"></div>
+  </div>
+
+  <div id="logpanel" class="panel">
+    <h3>◈ 操作记录</h3>
+    <ul class="log-list" id="logList"></ul>
+    <button class="winjing-backtohall" onclick="location.href='index.php'">回 到 大 厅</button>
+  </div>
+
+  <div id="board"></div>
+  <div id="aiThinking">对手思考中…</div>
+  <div id="resOverlay" class="hidden">
+    <div class="res-inner">
+      <div class="res-card" id="resCard">过关</div>
+      <div class="res-why" id="resWhy"></div>
+      <div class="res-sub" id="resSub"></div>
+      <div class="res-btns">
+        <button id="resNext">下 一 局</button>
+        <button id="resRetry" class="ghost">重 试</button>
+        <button id="resPick" class="ghost">残 局 库</button>
+      </div>
+    </div>
+  </div>
+  <div id="egOverlay">
+    <div class="eg-inner">
+      <div class="eg-head">
+        <h2>残 局 挑 战</h2>
+        <div class="sub">自己布阵出题、打官方残局、或者拿别人的信息码来挑战</div>
+      </div>
+      <div class="eg-tabs">
+        <button data-pane="make">制 作 残 局</button>
+        <button data-pane="official" class="on">官 方 残 局</button>
+        <button data-pane="play">挑 战 残 局</button>
+      </div>
+      <div class="eg-pane" id="pane-make">
+        <div class="eg-note">
+          左键放子、右键删子；选好棋种再点棋盘。摆完点<b>生成信息码</b>，可复制或存成 .fhq 文件，
+          下次上传/粘贴即可继续编辑。<br>
+          迷雾与自由行动<b>不由你设定</b>——它由局面本身派生（对方子棋不在场即已解雾），残局模拟的就是那时的环境。
+        </div>
+        <div class="ed-wrap">
+          <div id="edBoard"></div>
+          <div class="ed-side">
+            <div class="ed-sidepick">
+              <button id="edRed" class="red on">红 方</button>
+              <button id="edBlue" class="blue">蓝 方</button>
+            </div>
+            <div class="ed-pal" id="edPal"></div>
+            <div class="ed-tally" id="edTally"></div>
+
+            <div class="eg-row">
+              <label>先行方</label>
+              <select id="edTurn">
+                <option value="red">红方</option>
+                <option value="blue">蓝方</option>
+              </select>
+              <label>回合</label>
+              <input type="number" id="edRound" value="1" min="1" max="65535">
+            </div>
+            <div class="eg-row">
+              <label>玩家执</label>
+              <select id="edSide">
+                <option value="red">红方</option>
+                <option value="blue">蓝方</option>
+              </select>
+              <label>对手</label>
+              <select id="edAI"></select>
+            </div>
+            <div class="eg-row">
+              <label>目标</label>
+              <select id="edGoal">
+                <option value="standard">按常规棋规取胜</option>
+                <option value="slay">歼灭指定棋子</option>
+                <option value="survive">撑过若干回合</option>
+              </select>
+            </div>
+            <div class="eg-row" id="edSlayRow" style="display:none">
+              <label>歼灭</label>
+              <select id="edTarget"></select>
+              <label>数量</label>
+              <input type="number" id="edCount" value="1" min="1" max="20">
+            </div>
+            <div class="eg-row" id="edRoundsRow" style="display:none">
+              <label>撑过回合</label>
+              <input type="number" id="edRounds" value="10" min="1" max="999">
+            </div>
+            <div class="eg-row">
+              <label>步数上限</label>
+              <input type="number" id="edLimit" value="0" min="0" max="999">
+              <span style="font-size:11px;color:#8d8069">0 = 不限</span>
+            </div>
+            <div class="eg-row">
+              <label>名称</label>
+              <input type="text" id="edName" maxlength="24" placeholder="可留空"
+                style="background:rgba(0,0,0,.45);border:1px solid rgba(201,168,76,.4);color:#ffe9b8;border-radius:6px;padding:5px 8px;font-size:12.5px;flex:1 1 120px">
+            </div>
+
+            <div class="eg-row">
+              <button class="eg-btn" id="edGen">生 成 信 息 码</button>
+              <button class="eg-btn ghost" id="edTry">试 玩</button>
+              <button class="eg-btn ghost" id="edStd">标 准 开 局</button>
+              <button class="eg-btn warn" id="edClear">清 空</button>
+            </div>
+            <div class="eg-msg" id="edMsg"></div>
+          </div>
+        </div>
+        <div style="margin-top:12px">
+          <textarea class="eg-code" id="edCode" placeholder="信息码会出现在这里；也可以直接粘贴一段信息码，点「载入编辑」继续改"></textarea>
+          <div class="eg-row">
+            <button class="eg-btn ghost" id="edCopy">复 制</button>
+            <button class="eg-btn ghost" id="edSave">存 成 文 件</button>
+            <button class="eg-btn ghost" id="edLoad">载 入 编 辑</button>
+            <label class="eg-btn ghost" style="display:inline-block">上 传 文 件
+              <input type="file" id="edFile" accept=".fhq,.txt,text/plain" style="display:none">
+            </label>
+          </div>
+        </div>
+      </div>
+
+   
+      <div class="eg-pane on" id="pane-official">
+        <div class="eg-note">对手会真的思考，不是摆样子</div>
+        <div id="egOfficial"></div>
+      </div>
+
+    
+      <div class="eg-pane" id="pane-play">
+        <div class="eg-note">
+          粘贴信息码或上传 .fhq 文件。带设定的残局码会自带执子方、目标与对手强度；
+          <b>裸 FEN</b> 只有局面，需要你自己选。
+        </div>
+        <textarea class="eg-code" id="pgCode" placeholder="FHQ1 … 或 FHQP1|…"></textarea>
+        <div class="eg-row">
+          <button class="eg-btn ghost" id="pgCheck">校 验</button>
+          <label class="eg-btn ghost" style="display:inline-block">上 传 文 件
+            <input type="file" id="pgFile" accept=".fhq,.txt,text/plain" style="display:none">
+          </label>
+        </div>
+        <div id="pgOpts" style="display:none">
+          <div class="eg-row">
+            <label>玩家执</label>
+            <select id="pgSide">
+              <option value="red">红方</option>
+              <option value="blue">蓝方</option>
+            </select>
+            <label>对手</label>
+            <select id="pgAI"></select>
+            <label>目标</label>
+            <select id="pgGoal">
+              <option value="standard">按常规棋规取胜</option>
+              <option value="slay">全歼对方军棋</option>
+              <option value="survive">撑过 15 回合</option>
+            </select>
+          </div>
+        </div>
+        <div class="eg-row">
+          <button class="eg-btn" id="pgStart">开 始 挑 战</button>
+        </div>
+        <div class="eg-msg" id="pgMsg"></div>
+      </div>
+    </div>
+  </div>
+
+  <button class="eg-btn ghost" id="egBack" style="display:none">残 局 库</button>
+
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <radialGradient id="gRed" cx="35%" cy="28%" r="75%">
+        <stop offset="0%" stop-color="#ffd0c9" />
+        <stop offset="35%" stop-color="#ff6d6d" />
+        <stop offset="100%" stop-color="#8f1620" />
+      </radialGradient>
+      <radialGradient id="gBlue" cx="35%" cy="28%" r="75%">
+        <stop offset="0%" stop-color="#d5ecff" />
+        <stop offset="35%" stop-color="#5aa0ff" />
+        <stop offset="100%" stop-color="#153a86" />
+      </radialGradient>
+    </defs>
+  </svg>
+
+  <script src="assets/core/engine.js"></script>
+  <script src="assets/core/ui.js"></script>
+  <script src="assets/core/ai.js"></script>
+  <script src="assets/core/fen.js"></script>
+  <script src="assets/core/goal.js"></script>
+  <script src="assets/core/levels.js"></script>
+  <script src="assets/core/play.js"></script>
+  <script src="assets/core/puzzle.js"></script>
+  <script src="assets/core/editor.js"></script>
+  <script src="assets/core/endgame.js"></script>
+</body>
+
+</html>

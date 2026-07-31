@@ -1,0 +1,17 @@
+{
+  "name": "fenghuoqi",
+  "version": "1.0.0",
+  "description": "烽火棋 30x30 战棋 · socket.io 联机服务端",
+  "main": "server.js",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
+  }
+}

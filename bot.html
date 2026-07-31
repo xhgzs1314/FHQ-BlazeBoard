@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <title>烽火棋-人机对战</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="assets/game.css">
+</head>
+<style>
+  .winjing-backtohall{
+       margin-top: 14px;
+      width: 100%;
+      padding: 11px;
+      border: none;
+      border-radius: 9px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      cursor: pointer;
+      color: #071018;
+      font-family: inherit;
+      background: linear-gradient(135deg, #7fd0ff, #4a9bff);
+      box-shadow: 0 4px 18px rgba(70, 150, 255, .5);
+      transition: transform .12s, box-shadow .12s;
+  }
+  .winjing-backtohall2{
+      padding: 15px 20px;
+      border: none;
+      border-radius: 10px;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: .16em;
+      cursor: pointer;
+      color: #071018;
+      font-family: inherit;
+      background: linear-gradient(135deg, #7fd0ff, #4a9bff);
+      box-shadow: 0 5px 22px rgba(70,150,255,.6);
+      transition: transform .12s, box-shadow .12s;
+  }
+ 
+  #aiThinking{
+      display:none; margin-top:10px; padding:8px 10px; border-radius:8px;
+      font-size:13px; letter-spacing:.1em; font-weight:700; text-align:center;
+      color:#ffe9b0; background:rgba(255,180,60,.12); border:1px solid rgba(255,180,60,.35);
+  }
+  #aiThinking.on{ display:block; animation:aipulse 1s ease-in-out infinite; }
+  @keyframes aipulse{ 0%,100%{opacity:.55} 50%{opacity:1} }
+  .ai-tag{ font-size:11px; font-weight:700; letter-spacing:.08em; padding:2px 8px; border-radius:999px;
+      background:linear-gradient(135deg,#ff9b6d,#ff5d5d); color:#2a0d0d; margin-left:8px; vertical-align:middle; }
+</style>
+<body>
+  <div id="status" class="panel">
+    <h3>◈ 战局状态</h3>
+    <div class="turn-badge" id="turnBadge"><span class="turn-dot"></span>红方回合 · 第 1 回合</div>
+    <div id="aiThinking">AI 思考中…</div>
+    <div class="count-row">
+      <div class="count-box red">
+        <div class="num" id="redCount">20</div>
+        <div class="lbl">红方棋子</div>
+      </div>
+      <div class="count-box blue">
+        <div class="num" id="blueCount">20</div>
+        <div class="lbl">蓝方棋子</div>
+      </div>
+    </div>
+    <div class="thresh">
+      <div><span class="tag" id="coreTag">≤26</span>核心进攻限制：<b id="coreState" style="color:#ff9b9e">生效中</b></div>
+      <div><span class="tag on">≤20</span>迷雾解除阈值：<b id="fogThreshState">待触发</b></div>
+      <div><span class="tag">步长</span>军棋步长　红<b id="genStepR">3</b>　蓝<b id="genStepB">3</b></div>
+    </div>
+  </div>
+  <div id="fog" class="panel">
+    <h3>◈ 视野迷雾</h3>
+    <div class="fog-toggle">
+      <span class="fog-state" id="fogState">迷雾开启</span>
+      <div class="switch" id="fogSwitch"></div>
+    </div>
+    <div class="fog-hint" id="fogSides"><span class="fog-lamp"></span>红：迷雾　蓝：迷雾</div>
+    <div class="fog-hint">对方子棋阵亡 / 总数 ≤20 时解除</div>
+  </div>
+
+  <div id="legend" class="panel">
+    <h3>◈ 棋子图例</h3>
+    <div class="legend-grid" id="legendGrid"></div>
+  </div>
+
+  <div id="logpanel" class="panel">
+    <h3>◈ 操作记录</h3>
+    <ul class="log-list" id="logList">
+      <li>游戏开始</li>
+    </ul>
+    <button id="restart">重 新 开 始</button>
+    <button class="winjing-backtohall" onclick="window.close();setTimeout(function() {location.href = 'index.php';}, 200);">回 到 大 厅</button>
+  </div>
+
+  <div id="board"></div>
+
+  <div id="winOverlay">
+    <div class="win-inner">
+      <div class="win-card" id="winCard">获胜</div>
+      <div id="ratingPanel" style="display:none"></div>
+      <button id="winRestart">重 新 开 始</button>
+      <button class="winjing-backtohall2" onclick="window.close();setTimeout(function() {location.href = 'index.php';}, 200);">回 到 大 厅</button>
+    </div>
+  </div>
+
+
+  <div id="setupOverlay">
+    <div class="setup-card">
+      <div class="setup-title">人 机 对 战</div>
+      <div class="setup-sub">选择你的阵营与 AI 难度，随后开始对局</div>
+
+      <div class="setup-group">
+        <div class="setup-label">我方阵营</div>
+        <div class="opt-row" id="sideRow">
+          <button class="opt on" data-side="red">红方（先手）</button>
+          <button class="opt" data-side="blue">蓝方（后手）</button>
+        </div>
+      </div>
+
+      <div class="setup-group">
+        <div class="setup-label">AI 难度</div>
+        <div class="opt-col" id="diffRow">
+          <button class="opt diff on" data-diff="0"><b>炼狱</b><span>浅尝辄止</span></button>
+          <button class="opt diff" data-diff="1"><b>大师</b><span>Missing is Loving</span></button>
+          <button class="opt diff" data-diff="2"><b>棋手</b><span>带点脑子</span></button>
+          <button class="opt diff" data-diff="3"><b>新手</b><span>无头苍蝇</span></button>
+        </div>
+      </div>
+
+      <button id="startBtn" class="winjing-backtohall2" style="width:100%;margin-top:6px;">开 始 对 局</button>
+    </div>
+  </div>
+
+  <style>
+    #setupOverlay{ position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center;
+      background:rgba(5,10,18,.82); backdrop-filter:blur(6px); }
+    #setupOverlay.hidden{ display:none; }
+    .setup-card{ width:min(92vw,420px); padding:26px 24px; border-radius:16px;
+      background:linear-gradient(160deg,#0e1826,#0a121d); border:1px solid rgba(120,180,255,.25);
+      box-shadow:0 20px 60px rgba(0,0,0,.6); color:#dce8f5; font-family:inherit; }
+    .setup-title{ font-size:22px; font-weight:800; letter-spacing:.22em; text-align:center;
+      background:linear-gradient(135deg,#7fd0ff,#4a9bff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .setup-sub{ font-size:12.5px; text-align:center; color:#89a0b8; margin:8px 0 20px; letter-spacing:.04em; }
+    .setup-group{ margin-bottom:18px; }
+    .setup-label{ font-size:13px; font-weight:700; letter-spacing:.14em; color:#a9c2dc; margin-bottom:10px; }
+    .opt-row{ display:flex; gap:10px; }
+    .opt-col{ display:flex; flex-direction:column; gap:9px; }
+    .opt{ flex:1; padding:11px 12px; border-radius:10px; cursor:pointer; font-family:inherit;
+      background:rgba(255,255,255,.04); border:1px solid rgba(120,160,210,.2); color:#c7d6e6;
+      font-size:14px; font-weight:700; letter-spacing:.08em; transition:all .12s; text-align:left; }
+    .opt:hover{ border-color:rgba(127,208,255,.5); }
+    .opt.on{ background:linear-gradient(135deg,rgba(127,208,255,.22),rgba(74,155,255,.18));
+      border-color:#4a9bff; box-shadow:0 0 0 1px rgba(74,155,255,.4) inset; color:#eaf4ff; }
+    .opt.diff{ display:flex; flex-direction:column; gap:3px; }
+    .opt.diff b{ font-size:15px; letter-spacing:.14em; }
+    .opt.diff span{ font-size:11px; font-weight:500; letter-spacing:.02em; color:#8ba2ba; }
+  </style>
+
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <radialGradient id="gRed" cx="35%" cy="28%" r="75%">
+        <stop offset="0%" stop-color="#ffd0c9" />
+        <stop offset="35%" stop-color="#ff6d6d" />
+        <stop offset="100%" stop-color="#8f1620" />
+      </radialGradient>
+      <radialGradient id="gBlue" cx="35%" cy="28%" r="75%">
+        <stop offset="0%" stop-color="#d5ecff" />
+        <stop offset="35%" stop-color="#5aa0ff" />
+        <stop offset="100%" stop-color="#153a86" />
+      </radialGradient>
+    </defs>
+  </svg>
+
+  <script src="assets/core/engine.js"></script>
+  <script src="assets/core/rating.js"></script>
+  <script src="assets/core/ui.js"></script>
+  <script src="assets/core/scorefx.js"></script>
+  <script src="assets/core/replay.js"></script>
+  <script src="assets/core/ai.js"></script>
+  <script>
+    (function () {
+      var HUMAN = "red", DIFF = 0;            
+      var engine = Engine.createGame();
+      var ai = null, thinking = false;
+      var rec = Replay.attachRecorder({
+        mode: "local",
+        getNames: function () {
+          var aiName = "AI·" + (ai ? ai.difficultyName() : "");
+          return HUMAN === "red" ? { red: "玩家", blue: aiName } : { red: aiName, blue: "玩家" };
+        }
+      });
+
+      function aiSide() { return HUMAN === "red" ? "blue" : "red"; }
+      function setThinking(on) {
+        thinking = on;
+        var el = document.getElementById("aiThinking");
+        if (el) el.classList.toggle("on", on);
+      }
+      function showRating() {
+        if (!window.Rating) return;
+        UI.settle({
+          panel: "ratingPanel",
+          match: engine.state.over ? Rating.computeMatch(engine.getRatingData()) : null,
+          side: HUMAN,
+          cardSide: null,
+          extra: { hint: "点击任意处关闭" },
+        });
+      }
+
+      var ui = UI.createUI({
+        engine: engine,
+        getViewer: function () { return HUMAN; },                         
+        canInteract: function (p) {                                       
+          if (thinking || engine.state.over) return false;
+          if (engine.state.turn !== HUMAN) return false;
+          return !p || p.side === HUMAN;
+        },
+        onMove: function (id, r, c) {                                     
+          var res = engine.move(id, r, c);
+          if (res && res.ok) { rec.observe(engine); if (ai) ai.observe(); showRating(); scheduleAI(); }
+          return res;
+        },
+        onRestart: function () { openSetup(); },                          
+      });
+
+      
+      function scheduleAI() {
+        if (engine.state.over || engine.state.turn !== aiSide() || !ai) return;
+        setThinking(true);
+        setTimeout(stepAI, 260);        
+      }
+      function stepAI() {
+        if (engine.state.over || engine.state.turn !== aiSide() || !ai) { setThinking(false); return; }
+        var mv = null;
+        try { mv = ai.decide(aiSide()); } catch (e) { mv = null; }
+        var res = mv ? engine.move(mv.id, mv.r, mv.c) : null;
+        if (res && res.ok) {
+          ui.flashEvents(res.events);
+          ui.render();
+          rec.observe(engine); ai.observe(); showRating();
+        }
+        if (!engine.state.over && engine.state.turn === aiSide()) {
+          setTimeout(stepAI, 260);          
+        } else {
+          setThinking(false);
+          ui.render();
+        }
+      }
+
+    
+      var overlay = document.getElementById("setupOverlay");
+      var pendSide = "red", pendDiff = 0;
+      function bindOpts(rowId, attr, onPick) {
+        var row = document.getElementById(rowId);
+        row.querySelectorAll(".opt").forEach(function (b) {
+          b.addEventListener("click", function () {
+            row.querySelectorAll(".opt").forEach(function (x) { x.classList.remove("on"); });
+            b.classList.add("on");
+            onPick(b.getAttribute(attr));
+          });
+        });
+      }
+      bindOpts("sideRow", "data-side", function (v) { pendSide = v; });
+      bindOpts("diffRow", "data-diff", function (v) { pendDiff = parseInt(v, 10); });
+
+      function openSetup() {
+        setThinking(false);
+        overlay.classList.remove("hidden");
+      }
+      function startGame() {
+        HUMAN = pendSide; DIFF = pendDiff;
+        engine.reset();
+        ai = AI.create(engine, { side: aiSide(), difficulty: DIFF });
+        ai.observe();
+        overlay.classList.add("hidden");
+        ui.buildBoard();
+        ui.render();
+        showRating();
+        rec.observe(engine);              
+        scheduleAI();                     
+      }
+      document.getElementById("startBtn").addEventListener("click", startGame);
+    })();
+  </script>
+</body>
+</html>

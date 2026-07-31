@@ -1,0 +1,367 @@
+#egOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(10, 8, 5, .93);
+  overflow: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+#egOverlay.hidden {
+  display: none;
+}
+
+.eg-inner {
+  width: min(1180px, 96vw);
+  margin: 20px auto 40px;
+}
+
+.eg-head {
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.eg-head h2 {
+  font-size: 22px;
+  letter-spacing: 6px;
+  color: #ffd98a;
+  margin: 0 0 6px;
+}
+
+.eg-head .sub {
+  font-size: 12.5px;
+  color: #b8a98c;
+  letter-spacing: 1px;
+}
+
+.eg-tabs {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin: 14px 0 16px;
+  flex-wrap: wrap;
+}
+
+.eg-tabs button {
+  padding: 9px 22px;
+  border-radius: 9px 9px 0 0;
+  border: 1px solid rgba(201, 168, 76, .38);
+  border-bottom: 0;
+  background: rgba(0, 0, 0, .35);
+  color: #c9a84c;
+  font-size: 14px;
+  letter-spacing: 2px;
+  cursor: pointer;
+}
+
+.eg-tabs button.on {
+  background: linear-gradient(180deg, #6b5527, #3a2c14);
+  color: #ffe9b8;
+  border-color: #c9a84c;
+}
+
+.eg-pane {
+  display: none;
+  background: rgba(24, 18, 10, .72);
+  border: 1px solid rgba(201, 168, 76, .3);
+  border-radius: 12px;
+  padding: 16px 18px 20px;
+}
+
+.eg-pane.on {
+  display: block;
+}
+
+.eg-note {
+  font-size: 12px;
+  line-height: 1.9;
+  color: #b8a98c;
+  margin-bottom: 12px;
+}
+
+.eg-note b {
+  color: #ffd98a;
+}
+
+.eg-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 8px 0;
+}
+
+.eg-row label {
+  font-size: 12px;
+  color: #d8ccb2;
+  letter-spacing: 1px;
+}
+
+.eg-row select,
+.eg-row input[type="number"] {
+  background: rgba(0, 0, 0, .45);
+  border: 1px solid rgba(201, 168, 76, .4);
+  color: #ffe9b8;
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 12.5px;
+}
+
+.eg-row input[type="number"] {
+  width: 74px;
+}
+
+.eg-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #c9a84c;
+  background: linear-gradient(180deg, #6b5527, #46351a);
+  color: #ffe9b8;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+}
+
+.eg-btn.ghost {
+  background: transparent;
+  color: #c9a84c;
+}
+
+.eg-btn.warn {
+  border-color: #b4564f;
+  color: #ffb9b3;
+  background: transparent;
+}
+
+.eg-btn:disabled {
+  opacity: .4;
+  cursor: default;
+}
+
+.eg-code {
+  width: 100%;
+  min-height: 76px;
+  resize: vertical;
+  background: rgba(0, 0, 0, .5);
+  border: 1px solid rgba(201, 168, 76, .35);
+  border-radius: 8px;
+  color: #e9dcc0;
+  font-family: Consolas, Menlo, monospace;
+  font-size: 11.5px;
+  line-height: 1.6;
+  padding: 8px 10px;
+  word-break: break-all;
+}
+
+.eg-msg {
+  font-size: 12px;
+  line-height: 1.8;
+  margin-top: 8px;
+  min-height: 18px;
+}
+
+.eg-msg.ok {
+  color: #7ee6a2;
+}
+
+.eg-msg.bad {
+  color: #ff9b9e;
+}
+
+/* ---- 编辑器 ---- */
+.ed-wrap {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+#edBoard {
+  --n: 30;
+  width: min(62vmin, 560px);
+  height: min(62vmin, 560px);
+  display: grid;
+  grid-template-columns: repeat(var(--n), 1fr);
+  grid-template-rows: repeat(var(--n), 1fr);
+  background: radial-gradient(ellipse at 50% 50%, #6a5a3a 0%, #3a2a1a 100%);
+  border: 2px solid #c9a84c;
+  border-radius: 8px;
+  flex: 0 0 auto;
+  position: relative;
+  cursor: crosshair;
+}
+
+#edBoard .cell {
+  overflow: hidden;
+}
+
+#edBoard .cell .piece {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#edBoard .cell .piece svg {
+  width: 96%;
+  height: 96%;
+}
+
+#edBoard .cell.ed-hot {
+  outline: 1px solid rgba(255, 217, 138, .8);
+  outline-offset: -1px;
+}
+
+.ed-side {
+  flex: 1 1 300px;
+  min-width: 280px;
+}
+
+.ed-pal {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin: 6px 0 10px;
+}
+
+.ed-pal button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 2px 5px;
+  border-radius: 7px;
+  border: 1px solid rgba(201, 168, 76, .3);
+  background: rgba(0, 0, 0, .32);
+  color: #d8ccb2;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.ed-pal button .ico {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+}
+
+.ed-pal button .ico svg {
+  width: 26px;
+  height: 26px;
+}
+
+.ed-pal button.on {
+  border-color: #ffd98a;
+  background: rgba(201, 168, 76, .2);
+  color: #ffe9b8;
+}
+
+.ed-pal button .cnt {
+  font-size: 10px;
+  color: #b8a98c;
+  letter-spacing: 0;
+}
+
+.ed-pal button.full .cnt {
+  color: #ff9b9e;
+}
+
+.ed-tally {
+  font-size: 11.5px;
+  color: #b8a98c;
+  line-height: 1.8;
+  border-top: 1px solid rgba(201, 168, 76, .2);
+  padding-top: 7px;
+  margin-top: 4px;
+}
+
+.ed-tally b {
+  color: #ffd98a;
+}
+
+.ed-sidepick {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.ed-sidepick button {
+  flex: 1;
+  padding: 7px 0;
+  border-radius: 7px;
+  border: 1px solid rgba(201, 168, 76, .3);
+  background: rgba(0, 0, 0, .3);
+  color: #d8ccb2;
+  font-size: 12.5px;
+  letter-spacing: 2px;
+  cursor: pointer;
+}
+
+.ed-sidepick button.on.red {
+  border-color: #ff8f8f;
+  color: #ffd6d6;
+  background: rgba(180, 70, 70, .28);
+}
+
+.ed-sidepick button.on.blue {
+  border-color: #8fc0ff;
+  color: #d6e8ff;
+  background: rgba(60, 100, 180, .28);
+}
+
+/* ---- 关卡/残局列表 ---- */
+.eg-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
+}
+
+.eg-card {
+  text-align: left;
+  padding: 11px 13px;
+  border-radius: 9px;
+  border: 1px solid rgba(201, 168, 76, .28);
+  background: rgba(0, 0, 0, .3);
+  cursor: pointer;
+}
+
+.eg-card:hover {
+  border-color: #ffd98a;
+  transform: translateY(-1px);
+}
+
+.eg-card .n {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13.5px;
+  color: #ffe9b8;
+  letter-spacing: 1px;
+  margin-bottom: 5px;
+}
+
+.eg-card .g {
+  font-size: 11.5px;
+  color: #b8a98c;
+  line-height: 1.7;
+}
+
+.eg-card .star {
+  font-size: 11px;
+  color: #8d8069;
+  white-space: nowrap;
+}
+
+.eg-card .star.done {
+  color: #7ee6a2;
+}
+
+#egBack {
+  position: fixed;
+  top: 14px;
+  right: 16px;
+  z-index: 120;
+}
