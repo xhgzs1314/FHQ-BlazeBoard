@@ -77,8 +77,8 @@
 人机、本地双人、教学关卡、残局编辑器完全跑在浏览器里，不需要 PHP、MySQL、Node。
 
 ```bash
-git clone https://github.com/xihe-yh/fenghuoqi.git
-cd fenghuoqi
+git clone https://gitee.com/xihe-yh/fhqbzb.git
+cd fhqbzb
 # 任意静态服务器即可
 python -m http.server 8000
 ```
