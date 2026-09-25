@@ -167,20 +167,44 @@ $user_nickname = $_COOKIE['mokim_usergname'] ?? getStableName($q_suname);
     </defs>
   </svg>
   <div id="matchLobby">
+    <div class="match-bg">
+      <div class="match-aurora a"></div>
+      <div class="match-aurora b"></div>
+      <div class="match-grid"></div>
+      <span class="mote m1"></span><span class="mote m2"></span><span class="mote m3"></span><span class="mote m4"></span><span class="mote m5"></span>
+    </div>
     <div class="match-card">
-      <h2>烽火棋 · 排位竞技</h2>
+      <span class="corner tl"></span><span class="corner tr"></span>
+      <span class="corner bl"></span><span class="corner br"></span>
+      <div class="match-scan"></div>
+      <header class="match-head">
+        <div class="match-crest">烽</div>
+        <h2>烽火棋 · 排位竞技</h2>
+        <p class="match-sub">RANKED ARENA · 实时撮合</p>
+      </header>
       <div class="match-rank" id="matchRank">加载资料中…</div>
+
       <div id="matchIdle">
-        <p class="match-desc">进入匹配池，与积分相近的对手进行最公平的对局。</p>
+        <p class="match-desc">进入匹配池，与积分相近的对手展开最公平的厮杀。<br>两军对垒，胜负一念之间。</p>
         <button id="btnQueue" class="lobby-btn primary">开 始 匹 配</button>
       </div>
+
       <div id="matchSearching" style="display:none">
-        <div class="match-spinner"></div>
-        <div class="match-line">正在匹配对手…</div>
-        <div class="match-line small" id="matchElapsed">已等待 0 秒</div>
-        <div class="match-line small" id="matchPool">匹配池：— 人</div>
-        <button id="btnCancelQueue" class="lobby-btn">取 消 匹 配</button>
+        <div class="match-radar">
+          <span class="ring"></span><span class="ring d1"></span><span class="ring d2"></span>
+          <span class="sweep"></span>
+          <span class="orbit red"><i></i></span>
+          <span class="orbit blue"><i></i></span>
+          <span class="core"></span>
+        </div>
+        <div class="match-line">正在搜寻对手<span class="dots"><i>.</i><i>.</i><i>.</i></span></div>
+        <div class="match-readout">
+          <div class="ro clock"><span id="matchElapsed">已等待 0 秒</span></div>
+          <div class="ro pool"><span id="matchPool">匹配池：— 人</span></div>
+        </div>
+        <button id="btnCancelQueue" class="lobby-btn danger">取 消 匹 配</button>
       </div>
+
       <div id="matchMsg" class="match-msg"></div>
       <button id="btnBackHome" class="lobby-btn ghost">返回大厅</button>
     </div>
@@ -192,6 +216,7 @@ $user_nickname = $_COOKIE['mokim_usergname'] ?? getStableName($q_suname);
   <div id="netbar"></div>
 
   <style>
+    /* ===== 排位匹配大厅（颠覆性大换血）===== */
     #matchLobby {
       position: fixed;
       inset: 0;
@@ -199,112 +224,154 @@ $user_nickname = $_COOKIE['mokim_usergname'] ?? getStableName($q_suname);
       display: flex;
       align-items: center;
       justify-content: center;
-      background: radial-gradient(circle at 50% 40%, rgba(6, 16, 28, .85), rgba(2, 8, 14, .95));
-      backdrop-filter: blur(5px);
+      overflow: hidden;
+      background: radial-gradient(120% 90% at 50% -10%, #0b1c33 0%, #06101e 46%, #03070f 100%);
+      backdrop-filter: blur(6px);
     }
+    #matchLobby.hidden { display: none; }
 
-    #matchLobby.hidden {
-      display: none;
+    .match-bg { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+    .match-aurora { position: absolute; border-radius: 50%; filter: blur(60px); opacity: .55; mix-blend-mode: screen; }
+    .match-aurora.a {
+      width: 62vmax; height: 62vmax; left: -12vmax; top: -16vmax;
+      background: radial-gradient(circle, rgba(90,160,255,.6), transparent 60%);
+      animation: mfloat1 14s ease-in-out infinite;
+    }
+    .match-aurora.b {
+      width: 56vmax; height: 56vmax; right: -14vmax; bottom: -20vmax;
+      background: radial-gradient(circle, rgba(255,70,80,.5), transparent 60%);
+      animation: mfloat2 17s ease-in-out infinite;
+    }
+    @keyframes mfloat1 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(6vmax,4vmax) scale(1.12); } }
+    @keyframes mfloat2 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-5vmax,-4vmax) scale(1.1); } }
+    .match-grid {
+      position: absolute; inset: -2px;
+      background-image:
+        linear-gradient(rgba(120,170,255,.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(120,170,255,.06) 1px, transparent 1px);
+      background-size: 46px 46px;
+      -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 28%, transparent 78%);
+      mask-image: radial-gradient(circle at 50% 50%, #000 28%, transparent 78%);
+    }
+    .mote { position: absolute; bottom: -10px; width: 4px; height: 4px; border-radius: 50%;
+      background: #ffd9a0; box-shadow: 0 0 8px #ffb070; opacity: 0; animation: mmote linear infinite; }
+    .m1 { left: 12%; animation-duration: 11s; }
+    .m2 { left: 28%; animation-duration: 14s; animation-delay: 3s; }
+    .m3 { left: 46%; animation-duration: 9s; animation-delay: 1.5s; }
+    .m4 { left: 64%; animation-duration: 13s; animation-delay: 5s; }
+    .m5 { left: 82%; animation-duration: 10s; animation-delay: 2.5s; }
+    @keyframes mmote {
+      0% { transform: translateY(0) scale(.6); opacity: 0; }
+      12% { opacity: .9; }
+      88% { opacity: .6; }
+      100% { transform: translateY(-92vh) scale(1); opacity: 0; }
     }
 
     .match-card {
-      width: 340px;
-      padding: 30px 26px;
-      border-radius: 16px;
+      position: relative; z-index: 2;
+      width: min(92vw, 384px);
+      padding: 30px 28px 26px;
+      border-radius: 18px;
       text-align: center;
-      background: linear-gradient(155deg, rgba(20, 40, 64, .92), rgba(10, 22, 38, .96));
-      border: 1px solid rgba(140, 190, 255, .45);
-      box-shadow: 0 0 50px rgba(60, 140, 240, .4);
+      background: linear-gradient(160deg, rgba(16,32,54,.94), rgba(8,18,32,.97));
+      border: 1px solid rgba(120,170,255,.35);
+      box-shadow: 0 0 60px rgba(40,110,220,.35), inset 0 0 40px rgba(20,50,100,.25);
+      overflow: hidden;
     }
+    .corner { position: absolute; width: 22px; height: 22px; border: 2px solid rgba(140,200,255,.7); }
+    .corner.tl { top: 10px; left: 10px; border-right: 0; border-bottom: 0; }
+    .corner.tr { top: 10px; right: 10px; border-left: 0; border-bottom: 0; }
+    .corner.bl { bottom: 10px; left: 10px; border-right: 0; border-top: 0; }
+    .corner.br { bottom: 10px; right: 10px; border-left: 0; border-top: 0; }
+    .match-scan { position: absolute; left: 0; right: 0; top: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(120,200,255,.9), transparent);
+      opacity: .7; animation: mscan 3.4s linear infinite; }
+    @keyframes mscan { 0% { top: 0; opacity: 0; } 10% { opacity: .8; } 90% { opacity: .8; } 100% { top: 100%; opacity: 0; } }
 
-    .match-card h2 {
-      color: #eaf2ff;
-      letter-spacing: .2em;
-      margin-bottom: 14px;
-      text-shadow: 0 0 18px rgba(90, 160, 255, .6);
+    .match-head { margin-bottom: 14px; }
+    .match-crest {
+      width: 54px; height: 54px; margin: 0 auto 10px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; font-weight: 900; color: #fff;
+      background: linear-gradient(135deg, #ff6d6d, #5aa0ff);
+      box-shadow: 0 0 26px rgba(255,90,90,.5), 0 0 40px rgba(90,160,255,.4);
+      transform: rotate(-6deg);
     }
+    .match-card h2 { color: #eaf2ff; letter-spacing: .22em; margin: 0 0 4px; font-size: 19px; text-shadow: 0 0 18px rgba(90,160,255,.6); }
+    .match-sub { color: #7f9bc0; font-size: 11px; letter-spacing: .34em; margin: 0; }
 
     .match-rank {
-      font-size: 15px;
-      font-weight: 700;
-      color: #ffd66b;
-      margin-bottom: 16px;
-      letter-spacing: .05em;
+      display: inline-block; font-size: 14px; font-weight: 800; color: #ffd66b;
+      padding: 6px 16px; margin-bottom: 18px; border-radius: 999px;
+      background: linear-gradient(135deg, rgba(255,200,90,.16), rgba(255,140,40,.06));
+      border: 1px solid rgba(255,200,90,.4);
+      letter-spacing: .06em; box-shadow: 0 0 18px rgba(255,190,70,.25);
     }
 
-    .match-desc {
-      color: #a9bcd8;
-      font-size: 13px;
-      line-height: 1.7;
-      margin-bottom: 18px;
-    }
+    .match-desc { color: #a9bcd8; font-size: 13px; line-height: 1.8; margin-bottom: 20px; }
 
-    .match-line {
-      color: #cfe0ff;
-      font-size: 14px;
-      margin: 6px 0;
-      letter-spacing: .06em;
-    }
+    .match-line { color: #dcebff; font-size: 14px; letter-spacing: .08em; margin: 8px 0 4px; }
+    .dots i { animation: mblink 1.2s infinite; opacity: .2; }
+    .dots i:nth-child(2) { animation-delay: .2s; }
+    .dots i:nth-child(3) { animation-delay: .4s; }
+    @keyframes mblink { 0%,100% { opacity: .2; } 50% { opacity: 1; } }
 
-    .match-line.small {
-      color: #8fa6c4;
-      font-size: 12px;
-    }
+    .match-readout { display: flex; gap: 10px; justify-content: center; margin: 12px 0 4px; }
+    .ro { display: flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: 10px;
+      background: rgba(10,24,42,.7); border: 1px solid rgba(120,170,255,.28);
+      font-size: 13px; color: #cfe0ff; letter-spacing: .04em;
+      box-shadow: inset 0 0 18px rgba(60,140,240,.12); }
+    .ro.clock::before { content: "⏱"; }
+    .ro.pool::before { content: "◍"; color: #7fd0ff; }
 
-    .match-msg {
-      min-height: 18px;
-      color: #ff9b9e;
-      font-size: 13px;
-      margin: 10px 0 4px;
-    }
+    .match-msg { min-height: 18px; color: #ff9b9e; font-size: 13px; margin: 10px 0 2px; letter-spacing: .04em; text-shadow: 0 0 12px rgba(255,80,90,.5); }
 
-    .match-spinner {
-      width: 46px;
-      height: 46px;
-      margin: 6px auto 14px;
-      border: 4px solid rgba(140, 190, 255, .25);
-      border-top-color: #5aa0ff;
-      border-radius: 50%;
-      animation: mspin 0.9s linear infinite;
-    }
-
-    @keyframes mspin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
+    /* 雷达盘 */
+    .match-radar { position: relative; width: 172px; height: 172px; margin: 4px auto 14px; }
+    .match-radar .ring { position: absolute; inset: 0; border: 1px solid rgba(120,180,255,.5); border-radius: 50%; animation: mping 2.4s ease-out infinite; }
+    .match-radar .ring.d1 { animation-delay: .8s; }
+    .match-radar .ring.d2 { animation-delay: 1.6s; }
+    @keyframes mping { 0% { transform: scale(.35); opacity: .9; } 100% { transform: scale(1); opacity: 0; } }
+    .match-radar .sweep { position: absolute; inset: 0; border-radius: 50%;
+      background: conic-gradient(from 0deg, rgba(90,160,255,0) 0deg, rgba(90,160,255,0) 300deg, rgba(120,200,255,.6) 360deg);
+      -webkit-mask-image: radial-gradient(circle, transparent 27%, #000 29%);
+      mask-image: radial-gradient(circle, transparent 27%, #000 29%);
+      mix-blend-mode: screen; animation: mspin 2.2s linear infinite; }
+    .match-radar .orbit { position: absolute; inset: 0; animation: mspin 3.4s linear infinite; }
+    .match-radar .orbit.blue { animation-direction: reverse; }
+    .match-radar .orbit > i { position: absolute; top: 50%; left: 50%; width: 14px; height: 14px; margin: -7px; border-radius: 50%; }
+    .match-radar .orbit.red > i { transform: translateX(78px); background: radial-gradient(circle, #ffd0c9, #ff5d62); box-shadow: 0 0 14px #ff5d62; }
+    .match-radar .orbit.blue > i { transform: translateX(-78px); background: radial-gradient(circle, #d5ecff, #5aa0ff); box-shadow: 0 0 14px #5aa0ff; }
+    .match-radar .core { position: absolute; top: 50%; left: 50%; width: 12px; height: 12px; margin: -6px; border-radius: 50%;
+      background: radial-gradient(circle, #fff, #8fd0ff); box-shadow: 0 0 18px #8fd0ff, 0 0 40px #5aa0ff; animation: mpulse 1.6s ease-in-out infinite; }
+    @keyframes mpulse { 0%,100% { transform: scale(.86); opacity: .85; } 50% { transform: scale(1.12); opacity: 1; } }
 
     .lobby-btn {
-      padding: 11px 18px;
-      border: none;
-      border-radius: 9px;
-      font-weight: 700;
-      letter-spacing: .1em;
-      cursor: pointer;
-      color: #071018;
-      font-family: inherit;
-      background: linear-gradient(135deg, #7fd0ff, #4a9bff);
+      position: relative; display: inline-block; padding: 13px 18px; border: none; border-radius: 10px;
+      font-weight: 800; letter-spacing: .16em; cursor: pointer; color: #04101c; font-family: inherit; font-size: 15px;
+      background: linear-gradient(135deg, #7fd0ff, #4a9bff); overflow: hidden;
+      clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+      transition: transform .14s, box-shadow .2s, filter .2s;
     }
-
-    .lobby-btn.primary {
-      width: 100%;
-      margin-bottom: 6px;
-      font-size: 15px;
-      padding: 13px;
+    .lobby-btn::after { content: ""; position: absolute; top: 0; left: -60%; width: 50%; height: 100%;
+      background: linear-gradient(100deg, transparent, rgba(255,255,255,.5), transparent);
+      transform: skewX(-20deg); animation: msheen 3.2s ease-in-out infinite; }
+    .lobby-btn:hover { transform: translateY(-2px); filter: brightness(1.08); }
+    .lobby-btn:active { transform: translateY(0) scale(.98); }
+    .lobby-btn.primary { width: 100%; margin-bottom: 6px; animation: mpulseBtn 2.4s ease-in-out infinite; }
+    @keyframes mpulseBtn {
+      0%,100% { box-shadow: 0 0 22px rgba(74,155,255,.45), 0 8px 24px rgba(20,60,140,.4); }
+      50% { box-shadow: 0 0 36px rgba(120,200,255,.7), 0 8px 30px rgba(40,90,180,.55); }
     }
+    .lobby-btn.danger { width: 100%; margin-top: 14px; color: #fff; background: linear-gradient(135deg, #ff8a6a, #ff4d57);
+      box-shadow: 0 0 22px rgba(255,77,87,.5), 0 8px 24px rgba(120,20,30,.45); }
+    .lobby-btn.ghost { background: transparent; color: #9fb6d6; border: 1px solid rgba(140,190,255,.32); margin-top: 16px; font-size: 12px; box-shadow: none; }
+    .lobby-btn.ghost::after { display: none; }
+    @keyframes msheen { 0% { left: -60%; } 55%,100% { left: 130%; } }
+    @keyframes mspin { to { transform: rotate(360deg); } }
 
-    .lobby-btn.ghost {
-      background: transparent;
-      color: #8fa6c4;
-      border: 1px solid rgba(140, 190, 255, .3);
-      margin-top: 14px;
-      font-size: 12px;
-    }
-
-    #matchSearching .lobby-btn {
-      width: 100%;
-      margin-top: 12px;
-      background: linear-gradient(135deg, #ff9b7f, #ff5d62);
+    @media (prefers-reduced-motion: reduce) {
+      .match-aurora, .match-scan, .mote, .sweep, .ring, .orbit, .core, .lobby-btn::after, .lobby-btn.primary { animation: none !important; }
     }
 
     .rank-delta {
@@ -760,7 +827,7 @@ $user_nickname = $_COOKIE['mokim_usergname'] ?? getStableName($q_suname);
 
         $("btnQueue").onclick = () => {
           matchMsg("");
-          socket.emit("queueRanked", null, res => {
+          socket.emit("queueRanked", { name: window.USERNICKNAMESHOWED }, res => {
             if (!res || !res.ok) {
               matchMsg(res && res.reason || "无法进入匹配");
               return;
@@ -777,16 +844,21 @@ $user_nickname = $_COOKIE['mokim_usergname'] ?? getStableName($q_suname);
         };
 
         // 匹配成功
+        let matchRedName = "红方", matchBlueName = "蓝方";
+        const PEAK_ANON = 2000;   // 双方平均分超过此阈值则为公平起见匿名显示为“巅峰棋手”
         socket.on("matched", async ({
-          room,
-          side,
-          myScore,
-          foeScore
+          room, side, myScore, foeScore, myName, foeName
         }) => {
           matchMsg("");
+          const avg = ((Number(myScore) || 0) + (Number(foeScore) || 0)) / 2;
+          const anon = avg > PEAK_ANON;
+          const me = anon ? "巅峰棋手一" : (myName || window.USERNICKNAMESHOWED || "你");
+          const foe = anon ? "巅峰棋手二" : (foeName || "对手");
+          matchRedName = side === "red" ? me : foe;
+          matchBlueName = side === "blue" ? me : foe;
           await FHQAnim.ready({
-            red: side === "red" ? window.USERNICKNAMESHOWED : "巅峰棋手一",
-            blue: side === "blue" ? window.USERNICKNAMESHOWED : "巅峰棋手二"
+            red: matchRedName,
+            blue: matchBlueName
           });
           toasts_v2(`匹配成功！对手 ${foeScore} 分`);
           socket.emit("enterRanked", {
@@ -909,27 +981,8 @@ $user_nickname = $_COOKIE['mokim_usergname'] ?? getStableName($q_suname);
           try {
             const state = engine.state;
             let winner = state.over ? (state.winner || "draw") : null;
-            let redName = "红方";
-            let blueName = "蓝方";
-            if (mySide !== "spectator") {
-              if (winner === "red") {
-                if (mySide === "red") {
-                  redName = "你";
-                  blueName = "蓝方";
-                } else {
-                  redName = "对手";
-                  blueName = "蓝方";
-                }
-              } else if (winner === "blue") {
-                if (mySide === "blue") {
-                  redName = "红方";
-                  blueName = "你";
-                } else {
-                  redName = "红方";
-                  blueName = "对手";
-                }
-              }
-            }
+            let redName = matchRedName || "红方";
+            let blueName = matchBlueName || "蓝方";
             if (winner === "draw") {
               await FHQAnim.result("draw", {
                 red: redName,
@@ -952,11 +1005,23 @@ $user_nickname = $_COOKIE['mokim_usergname'] ?? getStableName($q_suname);
           const mine = data[mySide];
           if (mine) {
             const sign = mine.delta > 0 ? "+" : "";
+            const beforeTier = tierLabel(mine.scoreBefore);
+            const afterTier = tierLabel(mine.scoreAfter);
+            const isRankRise = mine.delta > 0;
+            const isRankDrop = mine.delta < 0;
+            const rankEvent = beforeTier !== afterTier ? (isRankRise ? "promotion" : "demotion") : "";
             settleExtra = {
               delta: mine.delta,
               deltaSuffix: " 分",
-              sub: `积分 ${mine.scoreBefore} → ${mine.scoreAfter} · ${tierLabel(mine.scoreAfter)}`,
-              hint: "点击任意处关闭",
+              scoreBefore: mine.scoreBefore,
+              scoreAfter: mine.scoreAfter,
+              tierBefore: beforeTier,
+              tierAfter: afterTier,
+              rankEvent,
+              resultLabel: isRankRise ? "段位提升" : (isRankDrop ? "段位下降" : "段位稳定"),
+              icon: isRankRise ? "▲" : (isRankDrop ? "▼" : "◆"),
+              sub: `${beforeTier} ${mine.scoreBefore} → ${afterTier} ${mine.scoreAfter}`,
+              hint: isRankRise ? "段位上升 · 你已经压过了这局的分差" : (isRankDrop ? "段位下滑 · 这场对局对排名影响很大" : "段位稳定 · 这局是保分回合"),
             };
             const el = $("rankDelta");
             el.textContent = `积分 ${mine.scoreBefore} → ${mine.scoreAfter}（${sign}${mine.delta}）· ${tierLabel(mine.scoreAfter)}`;

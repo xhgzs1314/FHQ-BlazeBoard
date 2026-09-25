@@ -128,6 +128,9 @@ DROP TABLE IF EXISTS `mok_player_rank`;
 CREATE TABLE `mok_player_rank`  (
   `user_id` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家ID',
   `score` int(11) NOT NULL DEFAULT 0 COMMENT '当前排位积分',
+  `rating` decimal(7,2) NOT NULL DEFAULT 1200.00 COMMENT '当前赛季竞技分（更细的真实分值）',
+  `tier` varchar(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'E' COMMENT '段位：S+,S,A,B,C,D,E',
+  `rating_dev` decimal(7,2) NOT NULL DEFAULT 180.00 COMMENT '波动程度，越高越不稳定',
   `matches` int(11) NOT NULL DEFAULT 0 COMMENT '总场次',
   `wins` int(11) NOT NULL DEFAULT 0 COMMENT '胜场',
   `draws` int(11) NOT NULL DEFAULT 0 COMMENT '平局',
@@ -135,9 +138,13 @@ CREATE TABLE `mok_player_rank`  (
   `max_streak` int(11) NOT NULL DEFAULT 0 COMMENT '历史最高连胜',
   `s_plus_count` int(11) NOT NULL DEFAULT 0 COMMENT 'S+次数',
   `season_high_score` int(11) NOT NULL DEFAULT 0 COMMENT '赛季最高分',
+  `last_match_delta` int(11) NOT NULL DEFAULT 0 COMMENT '最近一局变化值',
+  `recent_form` json NULL COMMENT '近十局表现：每局分差/结果/表现评分',
+  `last_match_time` datetime NULL DEFAULT NULL COMMENT '最近一局时间',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`) USING BTREE,
-  INDEX `idx_score`(`score`) USING BTREE
+  INDEX `idx_score`(`score`) USING BTREE,
+  INDEX `idx_tier`(`tier`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '玩家排位数据' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------

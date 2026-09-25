@@ -153,7 +153,21 @@
 
     function rebuildOcc() {
       occ = {};
-      pieces.forEach(p => { if (p.alive && !p.hidden) occ[p.r * N + p.c] = p; });
+      const bySide = { red: 0, blue: 0 };
+      const byType = { red: {}, blue: {} };
+      const deadGeneral = { red: 0, blue: 0 };
+      pieces.forEach(p => {
+        if (p.alive) {
+          bySide[p.side]++;
+          byType[p.side][p.type] = (byType[p.side][p.type] || 0) + 1;
+          if (!p.hidden) occ[p.r * N + p.c] = p;
+        } else if (p.type === "general") deadGeneral[p.side]++;
+      });
+      state.aliveTotal = bySide.red + bySide.blue;
+      state.aliveRed = bySide.red;
+      state.aliveBlue = bySide.blue;
+      state.aliveByType = byType;
+      state.deadGeneral = deadGeneral;
     }
     function pushLog(msg) { state.log.unshift(msg); if (state.log.length > 8) state.log.pop(); }
     function sideCN(s) { return s === "red" ? "红方" : "蓝方"; }
@@ -277,9 +291,9 @@
     }
 
     /* ---------- 计数 与 状态 ---------- */
-    function aliveCount(side) { return pieces.filter(p => p.alive && p.side === side).length; }
-    function totalAlive() { return pieces.filter(p => p.alive).length; }
-    function hasShield(side) { return pieces.some(p => p.alive && p.side === side && p.type === "shield"); }
+    function aliveCount(side) { return state[side === "red" ? "aliveRed" : "aliveBlue"]; }
+    function totalAlive() { return state.aliveTotal; }
+    function hasShield(side) { return !!state.aliveByType[side].shield; }
     function hasPrince(side) { return pieces.some(p => p.alive && p.side === side && p.type === "prince"); }
     function shieldDefenseActive(side) { return hasPrince(side); }
     function forwardDir(side) { return side === "red" ? 1 : -1; }
@@ -287,7 +301,7 @@
     function deadCount(side, type) { return pieces.filter(p => !p.alive && p.side === side && p.type === type).length; }
     function generalBonus(side) {
       if (state.lostRoyal[side]) return 0;
-      return Math.floor(deadCount(otherSide(side), "general") / 2);
+      return Math.floor(state.deadGeneral[otherSide(side)] / 2);
     }
     function pieceSpec(p) {
       if (p.revived) return { dirs: ORTHO, range: 1, capture: false };
@@ -304,6 +318,10 @@
     function kill(p) {
       if (!p.alive) return;
       p.alive = false;
+      state.aliveTotal--;
+      state[p.side === "red" ? "aliveRed" : "aliveBlue"]--;
+      state.aliveByType[p.side][p.type]--;
+      if (p.type === "general") state.deadGeneral[p.side]++;
       if (p.type === "mother" || p.type === "prince") state.lostRoyal[p.side] = true;
       if (p.type === "mother") {
         if (!state.motherDown) pushLog(`🌫 ${sideCN(p.side)}母棋阵亡 → 双方迷雾解除`);
@@ -525,6 +543,8 @@
         const prince = pieces.find(q => q.alive && q.side === side && q.type === "prince");
         if (prince) {
           prince.type = "mother"; prince.promoted = true;
+          state.aliveByType[side].prince--;
+          state.aliveByType[side].mother = (state.aliveByType[side].mother || 0) + 1;
           pushLog(`👑 ${sideCN(side)}子棋继位为母棋（横纵2·可吃·吃子复活）`);
         }
       });
@@ -533,9 +553,14 @@
       if (pieces.some(q => q.alive && q.r === r && q.c === c)) return;
       const dead = pieces.find(q => !q.alive && q.side === side);
       if (!dead) return;
-      const was = TYPES[dead.type].label;
+      const oldType = dead.type;
+      const was = TYPES[oldType].label;
       dead.alive = true; dead.revived = true; dead.promoted = false;
       dead.type = "pawn"; dead.r = r; dead.c = c;
+      state.aliveTotal++;
+      state[side === "red" ? "aliveRed" : "aliveBlue"]++;
+      state.aliveByType[side].pawn = (state.aliveByType[side].pawn || 0) + 1;
+      if (oldType === "general") state.deadGeneral[side]--;
       if (state.stats && state.stats[side]) state.stats[side].revives++;
       pushLog(`✚ ${sideCN(side)}复活${was}为白板棋→(${c},${r})（横纵1·不可吃）`);
     }

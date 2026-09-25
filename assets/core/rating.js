@@ -63,12 +63,26 @@
   ];
   function tierFor(rating) { return TIERS.find(t => rating >= t.min) || TIERS[TIERS.length - 1]; }
 
-  // ELO 变化：基础 25 + 评分因子×15
-  function eloDelta(rating, result) {
+  const TIER_RULES = {
+    "S+": { win: 0.8, loss: 1.42, draw: 1.0 },
+    "S": { win: 0.86, loss: 1.32, draw: 1.0 },
+    "A": { win: 0.94, loss: 1.22, draw: 1.0 },
+    "B": { win: 1.0, loss: 1.14, draw: 1.0 },
+    "C": { win: 1.08, loss: 1.08, draw: 1.0 },
+    "D": { win: 1.18, loss: 1.02, draw: 1.0 },
+    "E": { win: 1.35, loss: 0.96, draw: 1.0 }
+  };
+
+  function eloDelta(rating, result, performance = 8.0, gap = 0) {
     if (result === "draw") return 0;
-    const factor = (rating - 8.0) / 8.0;            // -0.75 ~ +1.0
-    const change = Math.round(25 + factor * 15);
-    return result === "win" ? change : -change;
+    const tier = tierFor(rating);
+    const tierCfg = TIER_RULES[tier.grade] || TIER_RULES.E;
+    const factor = clamp((rating - 8.0) / 8.0, -0.75, 1.25);
+    const spread = clamp(Math.abs(gap) / 5.0, 0, 2.4);
+    const quality = clamp((performance - 6.0) / 10.0, -0.4, 1.0);
+    const base = 18 + factor * 14 + spread * 8 + quality * 10;
+    const delta = result === "win" ? base * tierCfg.win : -base * tierCfg.loss;
+    return Math.round(delta);
   }
 
   // 百分位：正态分布
@@ -114,13 +128,20 @@
     const shortGame = data.round < 5;
     const resultOf = side =>
       data.winner === null ? "draw" : (data.winner === side ? "win" : "loss");
-    return {
+    const match = {
       winner: data.winner,
       round: data.round,
       shortGame,
       red: scoreSide(data.red, { result: resultOf("red"), shortGame }),
       blue: scoreSide(data.blue, { result: resultOf("blue"), shortGame }),
     };
+    const redGap = match.red.rating - match.blue.rating;
+    const blueGap = match.blue.rating - match.red.rating;
+    match.red.elo = eloDelta(match.red.rating, resultOf("red"), match.red.total, redGap);
+    match.blue.elo = eloDelta(match.blue.rating, resultOf("blue"), match.blue.total, blueGap);
+    match.red.result = resultOf("red");
+    match.blue.result = resultOf("blue");
+    return match;
   }
   /* ---------- 赛后渲染 ---------- */
   const DIM_ORDER = ["kill", "survive", "strategy", "resource", "offense", "discipline"];

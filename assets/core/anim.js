@@ -125,6 +125,31 @@ rgba(255,236,196,.16) 1.4vmin 1.7vmin);animation:fhqa-lines .5s ease-out both;
 will-change:transform,opacity}
 .fhqa-q0 .fhqa-lines{display:none}`,
 
+/* ---- 天雷 / 战场氛围（ready 专属） ---- */
+`.fhqa-storm{position:absolute;inset:0;pointer-events:none;opacity:0;
+animation:fhqa-storm-in .5s ease-out .12s both;will-change:opacity}
+.fhqa-storm .cloud{position:absolute;top:-22%;left:-10%;width:120%;height:62%;
+background:radial-gradient(60% 100% at 30% 0,rgba(22,16,32,.92),transparent 70%),
+radial-gradient(60% 100% at 78% 8%,rgba(14,18,36,.94),transparent 70%);
+filter:blur(2vmin);animation:fhqa-cloud 9s ease-in-out infinite alternate}
+.fhqa-storm .cloud.b{top:-28%;right:-12%;left:auto;
+background:radial-gradient(60% 100% at 60% 0,rgba(34,18,28,.9),transparent 70%);
+animation-duration:11s;animation-direction:alternate-reverse}
+.fhqa-storm .ground{position:absolute;left:-10%;right:-10%;bottom:-8%;height:28%;
+background:linear-gradient(0deg,rgba(46,14,8,.55),rgba(20,40,92,.2) 42%,transparent);
+mix-blend-mode:screen;filter:blur(1.4vmin)}
+.fhqa-bolt{position:absolute;top:-12%;left:34%;width:5vmin;height:74%;opacity:0;
+filter:drop-shadow(0 0 1.2vmin rgba(170,205,255,.95)) drop-shadow(0 0 3vmin rgba(120,170,255,.7));
+will-change:opacity,transform}
+.fhqa-bolt polyline{fill:none;stroke:#eaf3ff;stroke-width:2.4;stroke-linejoin:round;
+stroke-linecap:round;vector-effect:non-scaling-stroke}
+.fhqa-bolt.b2{left:62%;height:66%;transform:scaleX(-1)}
+.fhqa-bolt.b3{left:82%;height:82%;width:3.4vmin}
+.fhqa-nova{position:absolute;top:50%;left:50%;width:18vmin;height:18vmin;margin:-9vmin 0 0 -9vmin;
+border-radius:50%;border:.5vmin solid rgba(205,228,255,.92);opacity:0;
+box-shadow:0 0 6vmin rgba(150,190,255,.7);will-change:transform,opacity}
+.fhqa-q0 .fhqa-storm,.fhqa-q0 .fhqa-nova{display:none}`,
+
 /* 根节点身份钩子 */
 `.fhqa-root.fhqa-ready,.fhqa-root.fhqa-result{isolation:isolate}`,
 
@@ -240,7 +265,11 @@ to{transform:translate3d(-4%,-50%,0);opacity:0}}
 @keyframes fhqa-bar{0%{width:0}100%{width:46vmin}}
 @keyframes fhqa-gloss{0%{background-position:-140% 0;opacity:0}
 14%{opacity:1}100%{background-position:240% 0;opacity:0}}
-@keyframes fhqa-flash{0%{opacity:0}8%{opacity:1}100%{opacity:0}}`
+@keyframes fhqa-flash{0%{opacity:0}8%{opacity:1}100%{opacity:0}}
+@keyframes fhqa-storm-in{from{opacity:0}to{opacity:1}}
+@keyframes fhqa-cloud{0%{transform:translate3d(-3vmin,0,0) scale(1)}100%{transform:translate3d(4vmin,1.5vmin,0) scale(1.06)}}
+@keyframes fhqa-bolt{0%{opacity:0}5%{opacity:1}10%{opacity:.2}17%{opacity:.95}26%{opacity:0}34%{opacity:.7}42%{opacity:0}100%{opacity:0}}
+@keyframes fhqa-nova{0%{transform:scale(.2);opacity:0}10%{opacity:.95}100%{transform:scale(7);opacity:0}}`
   ].join("\n");
 
   function injectCSS() {
@@ -514,6 +543,8 @@ to{transform:translate3d(-4%,-50%,0);opacity:0}}
       const pil = fx.querySelector(".fhqa-pillar");
       if (pil) pil.style.animation = "fhqa-pillar .72s cubic-bezier(.15,.8,.25,1) both";
       if (parts.current) parts.current.spawnBurst(quality >= 2 ? 150 : 70, colors);
+      const nova = fx.querySelector(".fhqa-nova");
+      if (nova) nova.style.animation = "fhqa-nova .9s cubic-bezier(.1,.7,.2,1) both";
     });
   }
 
@@ -522,8 +553,19 @@ to{transform:translate3d(-4%,-50%,0);opacity:0}}
       '<div class="fhqa-ring r1"></div>' +
       (quality >= 1 ? '<div class="fhqa-ring r2"></div><div class="fhqa-ring r3"></div>' : "") +
       (pillar && quality >= 1 ? '<div class="fhqa-pillar"></div>' : "") +
+      (pillar && quality >= 1 ? '<div class="fhqa-nova"></div>' : "") +
       '<div class="fhqa-flash"></div>' +
       "</div>";
+  }
+
+  function stormLayer(quality) {
+    if (quality === 0) return "";
+    return '<div class="fhqa-storm">' +
+      '<div class="cloud"></div><div class="cloud b"></div><div class="ground"></div>' +
+      '<svg class="fhqa-bolt b1" viewBox="0 0 40 200" preserveAspectRatio="none"><polyline points="20,0 7,48 27,72 12,120 23,150 6,200"/></svg>' +
+      '<svg class="fhqa-bolt b2" viewBox="0 0 40 200" preserveAspectRatio="none"><polyline points="14,0 26,44 8,78 24,118 10,156 22,200"/></svg>' +
+      '<svg class="fhqa-bolt b3" viewBox="0 0 40 200" preserveAspectRatio="none"><polyline points="22,0 9,50 28,76 13,124 25,158 8,200"/></svg>' +
+      '</div>';
   }
 
   const SPARK = ["255,236,190", "255,196,110", "255,150,80", "255,255,246"];
@@ -557,7 +599,8 @@ to{transform:translate3d(-4%,-50%,0);opacity:0}}
             '<div class="fhqa-tag">' + tag + "</div></div>" +
         "</div>" +
         (q >= 1 ? '<canvas class="fhqa-cv"></canvas>' : "") +
-        fxLayer(q, true);
+        fxLayer(q, true) +
+        stormLayer(q);
 
       const cv = root.querySelector(".fhqa-cv");
       if (cv) { parts.current = createParticles(cv, q); parts.current.start(); }
@@ -568,7 +611,23 @@ to{transform:translate3d(-4%,-50%,0);opacity:0}}
           sh[i].style.animation = "fhqa-sheen .85s cubic-bezier(.3,0,.4,1) " + (i * 0.09) + "s both";
         }
       });
+      // 天雷：蓄势一击 + 命中主雷
+      const bolts = root.querySelectorAll(".fhqa-bolt");
+      const strikeBolts = (dur) => {
+        for (let i = 0; i < bolts.length; i++) {
+          const b = bolts[i];
+          b.style.animation = "none"; void b.offsetWidth;
+          b.style.animation = "fhqa-bolt " + dur + "s linear both";
+        }
+      };
+      at(q === 0 ? 240 : 400, () => strikeBolts(0.9));
       impact(root, at, parts, q, HIT, SPARK);
+      at(HIT, () => strikeBolts(0.8));
+      if (parts.current) {
+        const embers = ["255,120,40", "255,170,80", "180,200,255", "120,150,255"];
+        at(HIT + 40, () => parts.current.spawnRain(q >= 2 ? 42 : 20, embers));
+        at(HIT + 280, () => parts.current.spawnRain(q >= 2 ? 30 : 14, embers));
+      }
       if (typeof opts.onImpact === "function") at(HIT, () => { try { opts.onImpact(); } catch (e) {} });
       }, total, tok);
     }), tok);

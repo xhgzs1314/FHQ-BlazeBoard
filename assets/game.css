@@ -41,6 +41,7 @@ body::before {
 /* ================= BOARD ================= */
 #board {
   --n: 30;
+  contain: layout paint;
   width: min(94vmin, 98vw);
   height: min(94vmin, 98vw);
   display: grid;
@@ -385,6 +386,7 @@ body::before {
   backdrop-filter: blur(10px);
   box-shadow: 0 14px 44px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255, 236, 193, 0.06);
   padding: 14px 18px;
+  contain: layout paint;
 }
 
 .panel h3 {
@@ -567,6 +569,7 @@ body::before {
   background: #d4b8a0;
   box-shadow: 0 0 10px rgba(201, 168, 76, 0.3);
   margin-right: 6px;
+  will-change: opacity;
   animation: pulse 2.4s infinite;
 }
 

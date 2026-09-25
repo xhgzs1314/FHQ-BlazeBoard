@@ -168,7 +168,7 @@
       document.head.appendChild(st);
     })();
 
-    function buildBoard() {
+    function buildBoardOnce() {
       board.innerHTML = "";
       cells = []; pieceEls = []; intelEls = []; sig = new Array(N * N).fill("");
       const frag = document.createDocumentFragment();
@@ -200,6 +200,28 @@
       board.appendChild(frag);
       startMusic();
     }
+
+    function resetBoardState() {
+      sig = new Array(N * N).fill("");
+      selected = null;
+      prevPieces = null;
+      prevFogged = null;
+      prevOver = false;
+      for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
+        const pe = pieceEls[r][c];
+        pe.innerHTML = "";
+        pe._t = "";
+        pe.style.display = "none";
+        pe.style.visibility = "";
+        intelEls[r][c].style.display = "none";
+      }
+      const veil = board.querySelector(".fog-veil");
+      if (veil) veil.remove();
+      lastLog = "";
+      hudCache = {};
+    }
+
+    function buildBoard() { resetBoardState(); }
 
     // 预计算「当前视角可见格集合」
     function buildVisset(viewer, state) {
@@ -310,16 +332,29 @@
       const permit = state.permit[viewer] || null;
       const revealed = state.revealed[viewer] || new Set();
       const visset = buildVisset(viewer, state);   // null=全可见
+      const aliveTotal = state.aliveTotal;
+      const fogOff = state.motherDown || aliveTotal <= 20 || state.fogCleared[viewer];
+      const freeAct = state.freeAct[viewer] || aliveTotal <= 20;
+      const turn = state.turn;
+      const over = state.over;
+      const pieceAt = new Array(N * N);
+      for (const piece of engine.pieces) {
+        if (piece.alive && !piece.hidden) pieceAt[piece.r * N + piece.c] = piece;
+      }
       for (let r = 0; r < N; r++) {
         for (let c = 0; c < N; c++) {
           const key = r * N + c;
           const seen = visset === null || visset.has(key);
           const inPermit = permit && r >= permit.r0 && r <= permit.r1 && c >= permit.c0 && c <= permit.c1;
           const hasIntel = revealed.has(key);
-          const p = engine.pieceAt(r, c);
+          const p = pieceAt[key];
           const hide = p && p.side !== viewer && !seen;
           const showP = p && !hide;
-          const actable = showP && !state.over && p.side === state.turn && engine.canAct(p) && opts.canInteract(p);
+          const pVisible = fogOff || visset === null || visset.has(key);
+          const actableByState = p && p.side === turn && (freeAct || p.type === "scout" ||
+            (p.side === "red" ? (p.r === 0 || p.r === 1) : (p.r === 28 || p.r === 29)) ||
+            (permit && p.r >= permit.r0 && p.r <= permit.r1 && p.c >= permit.c0 && p.c <= permit.c1 && pVisible));
+          const actable = showP && !over && actableByState && opts.canInteract(p);
           const isSel = sel && sel.alive && sel.r === r && sel.c === c;
           const isMove = moveSet.has(key);
           const isCap = capSet.has(key);
@@ -356,45 +391,54 @@
 
     function sideCN(s) { return s === "red" ? "红方" : "蓝方"; }
     let lastLog = "";
+    let hudCache = {};
 
     function renderHUD() {
       const state = engine.state;
       const t = state.turn, red = t === "red";
       const badge = document.getElementById("turnBadge");
       if (badge) {
-        badge.innerHTML = `<span class="turn-dot"></span>${sideCN(t)}回合 · 第 ${state.round} 回合`;
-        badge.style.background = red ? "rgba(230,70,75,.16)" : "rgba(70,130,235,.18)";
-        badge.style.color = red ? "#ff9b9e" : "#9cc4ff";
-        badge.style.borderColor = red ? "rgba(255,110,110,.5)" : "rgba(120,180,255,.55)";
-        badge.style.boxShadow = red ? "0 0 16px rgba(255,80,85,.3)" : "0 0 16px rgba(80,150,255,.35)";
-        const dot = badge.querySelector(".turn-dot");
-        if (dot) { dot.style.background = red ? "#ff5d62" : "#5aa0ff"; dot.style.boxShadow = `0 0 10px ${red ? "#ff5d62" : "#5aa0ff"}`; }
+        const badgeText = `${sideCN(t)}回合 · 第 ${state.round} 回合`;
+        if (hudCache.badgeText !== badgeText) { badge.innerHTML = `<span class="turn-dot"></span>${badgeText}`; hudCache.badgeText = badgeText; }
+        const badgeStyle = red ? "red" : "blue";
+        if (hudCache.badgeStyle !== badgeStyle) {
+          badge.style.background = red ? "rgba(230,70,75,.16)" : "rgba(70,130,235,.18)";
+          badge.style.color = red ? "#ff9b9e" : "#9cc4ff";
+          badge.style.borderColor = red ? "rgba(255,110,110,.5)" : "rgba(120,180,255,.55)";
+          badge.style.boxShadow = red ? "0 0 16px rgba(255,80,85,.3)" : "0 0 16px rgba(80,150,255,.35)";
+          const dot = badge.querySelector(".turn-dot");
+          if (dot) { dot.style.background = red ? "#ff5d62" : "#5aa0ff"; dot.style.boxShadow = `0 0 10px ${red ? "#ff5d62" : "#5aa0ff"}`; }
+          hudCache.badgeStyle = badgeStyle;
+        }
       }
-      const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-      set("redCount", engine.pieces.filter(p => p.alive && p.side === "red").length);
-      set("blueCount", engine.pieces.filter(p => p.alive && p.side === "blue").length);
+      const set = (id, v) => { if (hudCache[id] === v) return; const el = document.getElementById(id); if (el) el.textContent = v; hudCache[id] = v; };
+      set("redCount", state.aliveRed);
+      set("blueCount", state.aliveBlue);
       const gsR = document.getElementById("genStepR"), gsB = document.getElementById("genStepB");
       // 军棋步长 = 基础3 + 加成
-      const bonus = s => state.lostRoyal[s] ? 0 : Math.floor(engine.pieces.filter(p => !p.alive && p.side === (s === "red" ? "blue" : "red") && p.type === "general").length / 2);
-      if (gsR) gsR.textContent = 3 + bonus("red");
-      if (gsB) gsB.textContent = 3 + bonus("blue");
+      const bonus = s => state.lostRoyal[s] ? 0 : Math.floor(state.deadGeneral[s === "red" ? "blue" : "red"] / 2);
+      set("genStepR", 3 + bonus("red"));
+      set("genStepB", 3 + bonus("blue"));
 
-      const total = engine.pieces.filter(p => p.alive).length;
+      const total = state.aliveTotal;
       const core = document.getElementById("coreState");
-      if (core) { const on = total > 26; core.textContent = on ? "生效中" : "已解除"; core.style.color = on ? "#ff9b9e" : "#7ee6a2"; }
+      if (core && hudCache.coreOn !== (total > 26)) { const on = total > 26; core.textContent = on ? "生效中" : "已解除"; core.style.color = on ? "#ff9b9e" : "#7ee6a2"; hudCache.coreOn = on; }
       const fog = document.getElementById("fogThreshState");
       const threshOff = total <= 20;
-      if (fog) { fog.textContent = threshOff ? "已触发" : "待触发"; fog.style.color = threshOff ? "#7ee6a2" : "#c7a1ff"; }
+      if (fog && hudCache.threshOff !== threshOff) { fog.textContent = threshOff ? "已触发" : "待触发"; fog.style.color = threshOff ? "#7ee6a2" : "#c7a1ff"; hudCache.threshOff = threshOff; }
       const cleared = s => threshOff || state.fogCleared[s];
       const sides = document.getElementById("fogSides");
-      if (sides) sides.innerHTML = `<span class="fog-lamp"></span>红方${cleared("red") ? "解除" : "迷雾"}　蓝方${cleared("blue") ? "解除" : "迷雾"}`;
+      const sidesText = `${cleared("red") ? "解除" : "迷雾"}|${cleared("blue") ? "解除" : "迷雾"}`;
+      if (sides && hudCache.sidesText !== sidesText) { sides.innerHTML = `<span class="fog-lamp"></span>红方${cleared("red") ? "解除" : "迷雾"}　蓝方${cleared("blue") ? "解除" : "迷雾"}`; hudCache.sidesText = sidesText; }
       const bothClear = cleared("red") && cleared("blue");
       const fs = document.getElementById("fogState");
-      if (fs) { fs.textContent = bothClear ? "迷雾解除" : "迷雾开启"; fs.style.color = bothClear ? "#7ee6a2" : "#c7a1ff"; }
-      const sw = document.getElementById("fogSwitch"); if (sw) sw.classList.toggle("off", bothClear);
+      if (fs && hudCache.bothClear !== bothClear) { fs.textContent = bothClear ? "迷雾解除" : "迷雾开启"; fs.style.color = bothClear ? "#7ee6a2" : "#c7a1ff"; }
+      const sw = document.getElementById("fogSwitch");
+      if (hudCache.bothClear !== bothClear) { if (sw) sw.classList.toggle("off", bothClear); hudCache.bothClear = bothClear; }
       const ul = document.getElementById("logList");
       const mask = opts.maskLog;
-      if (ul) ul.innerHTML = state.log.map(m => `<li>${mask ? mask(m) : m}</li>`).join("");
+      const log = state.log.map(m => `<li>${mask ? mask(m) : m}</li>`).join("");
+      if (ul && log !== lastLog) { ul.innerHTML = log; lastLog = log; }
       // 浮层
       const ov = document.getElementById("winOverlay");
       if (ov) {
@@ -465,7 +509,7 @@
       });
     })();
 
-    buildBoard();
+    buildBoardOnce();
     render();
     return { render, flashEvents, clearSelection, buildBoard };
   }

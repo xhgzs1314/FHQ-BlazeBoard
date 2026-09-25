@@ -510,7 +510,7 @@ function createRankedRoom(a, b) {
   rooms.set(id, room);
   const notify = (entry, side, foe) => {
     const s = io.sockets.sockets.get(entry.socketId);
-    if (s) s.emit("matched", { room: id, side, myScore: entry.score, foeScore: foe.score });
+    if (s) s.emit("matched", { room: id, side, myScore: entry.score, foeScore: foe.score, myName: entry.name, foeName: foe.name });
   };
   notify(red, "red", blue);
   notify(blue, "blue", red);
@@ -589,8 +589,9 @@ io.on("connection", (socket) => {
   }
 
   // 进入排位匹配池
-  socket.on("queueRanked", (_, cb) => {
+  socket.on("queueRanked", (data, cb) => {
     if (!socket.data.uid) return cb && cb({ ok: false, reason: "未登录，无法进行排位" });
+    const reqName = (data && typeof data.name === "string") ? data.name.slice(0, 30) : "";
     if (joined) return cb && cb({ ok: false, reason: "请先离开当前对局" });
     if (rankQueue.has(socket.id)) return cb && cb({ ok: true, queued: true });
     callPhp("/api/ranked/profile.php", { uid: socket.data.uid }).then((resp) => {
@@ -599,6 +600,7 @@ io.on("connection", (socket) => {
       rankQueue.set(socket.id, {
         socketId: socket.id, uid: socket.data.uid,
         score: resp.data.score, enqueuedAt: Date.now(),
+        name: reqName,
       });
       cb && cb({ ok: true, queued: true, profile: resp.data, poolSize: rankQueue.size });
     });

@@ -95,13 +95,99 @@ rgba(10,8,16,.58) 0%,rgba(5,4,9,.86) 58%,rgba(0,0,0,.95) 100%);
 animation:fhqs-veil-in .34s ease-out forwards}
 .fhqs-q2 .fhqs-veil{-webkit-backdrop-filter:blur(9px) saturate(.82);backdrop-filter:blur(9px) saturate(.82)}
 .fhqs-out .fhqs-veil{animation:fhqs-veil-out .34s ease-in forwards}
-.fhqs-cv{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
-.fhqs-flash{position:absolute;inset:0;opacity:0;pointer-events:none;mix-blend-mode:screen;
+.fhqs-cv{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;z-index:1}
+.fhqs-flash{position:absolute;inset:0;opacity:0;pointer-events:none;mix-blend-mode:screen;z-index:6;
 background:radial-gradient(circle at 50% 50%,#fff 0%,rgba(var(--tl),.72) 30%,rgba(var(--t),0) 66%)}
+.fhqs-rush,.fhqs-cracks{position:absolute;inset:0;pointer-events:none;overflow:hidden;opacity:0}
+.fhqs-rush::before,.fhqs-rush::after{content:"";position:absolute;left:50%;top:50%;width:150vmax;height:2px;
+transform-origin:center;background:linear-gradient(90deg,transparent,rgba(255,255,255,.95),rgba(var(--t),.9),transparent);
+filter:blur(.2px);box-shadow:0 0 14px rgba(var(--tl),.8)}
+.fhqs-rush::before{transform:translate(-50%,-50%) rotate(18deg)}
+.fhqs-rush::after{transform:translate(-50%,-50%) rotate(-18deg);opacity:.7}
+.fhqs-rank-rise .fhqs-rush{animation:fhqs-rush-in .9s cubic-bezier(.16,1,.3,1) .2s both}
+@keyframes fhqs-rush-in{0%{opacity:0;transform:scale(.25)}35%{opacity:1}100%{opacity:0;transform:scale(1.25)}}
+.fhqs-cracks::before,.fhqs-cracks::after{content:"";position:absolute;left:50%;top:50%;width:min(68vw,560px);height:min(68vw,560px);
+transform:translate(-50%,-50%) rotate(14deg);border:1px solid rgba(255,92,82,.7);
+clip-path:polygon(49% 0,52% 38%,76% 14%,58% 46%,100% 45%,60% 54%,82% 82%,54% 59%,48% 100%,45% 61%,14% 82%,40% 55%,0 58%,39% 46%,17% 18%,45% 39%);
+box-shadow:0 0 28px rgba(255,61,52,.45)}
+.fhqs-cracks::after{transform:translate(-50%,-50%) rotate(-30deg) scale(.72);opacity:.55}
+.fhqs-rank-drop .fhqs-cracks{animation:fhqs-crack-in .8s cubic-bezier(.2,.8,.3,1) .18s both}
+@keyframes fhqs-crack-in{0%{opacity:0;transform:scale(1.6)}20%{opacity:1}100%{opacity:.72;transform:scale(1)}}
+/* ===== 段位奇观：龙盘绕冲天 / 恶魔捏碎心脏 ===== */
+.fhqs-spectacle{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;
+pointer-events:none;perspective:1100px;overflow:hidden}
+.fhqs-spec-cv{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;z-index:1;opacity:0;
+transition:opacity .4s ease-out}
+.fhqs-lit .fhqs-spec-cv{opacity:1}
+.fhqs-spectacle svg{width:min(90vw,660px);height:min(90vw,660px);overflow:visible;opacity:0;
+filter:drop-shadow(0 0 34px rgba(var(--t),.62));transition:opacity .6s ease-out}
+.fhqs-lit .fhqs-spectacle svg{opacity:1}
+.fhqs-dragon,.fhqs-demon{transform-style:preserve-3d}
+.fhqs-dragon{transform-origin:50% 58%}
+.fhqs-demon{transform-origin:50% 56%}
+.fhqs-spec-rays{position:absolute;top:50%;left:50%;width:170vmax;height:170vmax;margin:-85vmax 0 0 -85vmax;
+opacity:0;mix-blend-mode:screen;border-radius:50%;pointer-events:none;
+background:conic-gradient(from 0deg,rgba(255,226,168,.32) 0deg,rgba(255,226,168,0) 8deg,
+rgba(255,226,168,0) 22deg,rgba(255,226,168,.28) 30deg,rgba(255,226,168,0) 38deg,
+rgba(255,226,168,0) 52deg,rgba(255,226,168,.32) 60deg,rgba(255,226,168,0) 68deg,
+rgba(255,226,168,0) 82deg,rgba(255,226,168,.24) 90deg,rgba(255,226,168,0) 98deg,
+rgba(255,226,168,0) 112deg,rgba(255,226,168,.3) 120deg,rgba(255,226,168,0) 128deg,
+rgba(255,226,168,0) 142deg,rgba(255,226,168,.26) 150deg,rgba(255,226,168,0) 158deg,
+rgba(255,226,168,0) 172deg,rgba(255,226,168,.32) 180deg,rgba(255,226,168,0) 188deg,
+rgba(255,226,168,0) 202deg,rgba(255,226,168,.28) 210deg,rgba(255,226,168,0) 218deg,
+rgba(255,226,168,0) 232deg,rgba(255,226,168,.32) 240deg,rgba(255,226,168,0) 248deg,
+rgba(255,226,168,0) 262deg,rgba(255,226,168,.24) 270deg,rgba(255,226,168,0) 278deg,
+rgba(255,226,168,0) 292deg,rgba(255,226,168,.3) 300deg,rgba(255,226,168,0) 308deg,
+rgba(255,226,168,0) 322deg,rgba(255,226,168,.26) 330deg,rgba(255,226,168,0) 338deg,
+rgba(255,226,168,0) 352deg,rgba(255,226,168,.32) 360deg);
+-webkit-mask-image:radial-gradient(circle at 50% 50%,transparent 12%,#000 36%,transparent 64%);
+mask-image:radial-gradient(circle at 50% 50%,transparent 12%,#000 36%,transparent 64%)}
+.fhqs-demon .fhqs-spec-rays{filter:hue-rotate(-18deg) saturate(1.25)}
+.fhqs-root.fhqs-lit.fhqs-soar .fhqs-spec-rays,.fhqs-root.fhqs-lit.fhqs-crush .fhqs-spec-rays{
+animation:fhqs-spec-rays-in 1.1s ease-out both,fhqs-spin 20s linear infinite}
+@keyframes fhqs-spec-rays-in{0%{opacity:0;transform:scale(.5)}100%{opacity:.95;transform:scale(1)}}
+/* 龙：入场盘绕蓄力 */
+.fhqs-lit .fhqs-dragon{animation:fhqs-dragon-enter 1.2s cubic-bezier(.16,.8,.24,1) both}
+.fhqs-dragon-body{transform-origin:50% 58%;animation:fhqs-dragon-coil 2.6s ease-in-out .2s infinite}
+.fhqs-dragon-wing{transform-origin:50% 50%;animation:fhqs-wing-beat .46s ease-in-out .4s infinite alternate}
+.fhqs-dragon-wing.back{opacity:.5;transform:scaleX(-1)}
+.fhqs-dragon-tail{transform-origin:50% 70%;animation:fhqs-tail-sway 1.8s ease-in-out infinite}
+.fhqs-dragon-eye{animation:fhqs-eye-glow 1.4s ease-in-out infinite}
+/* 龙：冲天 */
+.fhqs-root.fhqs-lit.fhqs-soar .fhqs-dragon{animation:fhqs-dragon-soar 1.55s cubic-bezier(.16,.7,.2,1) both}
+.fhqs-soar .fhqs-dragon-flame{animation:fhqs-flame-burst .6s ease-out .05s both}
+.fhqs-soar .fhqs-dragon-wing{animation:fhqs-wing-beat .26s ease-in-out infinite alternate}
+/* 恶魔：入场降临 */
+.fhqs-lit .fhqs-demon{animation:fhqs-demon-enter 1s cubic-bezier(.15,.8,.25,1) both}
+.fhqs-demon-shadow{transform-origin:50% 60%;animation:fhqs-shadow-breathe 2.4s ease-in-out infinite}
+.fhqs-demon-eye{animation:fhqs-eye-glow 1.2s ease-in-out infinite}
+.fhqs-demon-hand{transform-origin:50% 52%;animation:fhqs-hand-grab 2.2s ease-in-out .3s infinite}
+.fhqs-demon-heart{transform-origin:50% 56%;animation:fhqs-heart-beat 1s ease-in-out infinite}
+/* 恶魔：捏碎 */
+.fhqs-root.fhqs-lit.fhqs-crush .fhqs-demon-hand{animation:fhqs-hand-clench 1.1s cubic-bezier(.2,.9,.2,1) both}
+.fhqs-root.fhqs-lit.fhqs-crush .fhqs-demon-heart{animation:fhqs-heart-crush 1.1s cubic-bezier(.2,.9,.2,1) both}
+.fhqs-demon-shards{opacity:0;transform-origin:50% 56%}
+.fhqs-root.fhqs-lit.fhqs-crush .fhqs-demon-shards{animation:fhqs-shards-explode .8s ease-out .55s both}
+@keyframes fhqs-dragon-enter{0%{opacity:0;transform:translateY(28vh) scale(.32) rotateX(20deg) rotateY(-30deg)}55%{opacity:1}100%{opacity:1;transform:translateY(0) scale(1) rotateX(0) rotateY(0)}}
+@keyframes fhqs-dragon-coil{0%{transform:rotateZ(-7deg) rotateY(-16deg)}50%{transform:rotateZ(7deg) rotateY(16deg)}100%{transform:rotateZ(-7deg) rotateY(-16deg)}}
+@keyframes fhqs-wing-beat{from{transform:rotateX(0) rotateZ(0) scaleY(1)}to{transform:rotateX(34deg) rotateZ(6deg) scaleY(.62)}}
+@keyframes fhqs-tail-sway{0%,100%{transform:rotateZ(-6deg)}50%{transform:rotateZ(8deg)}}
+@keyframes fhqs-eye-glow{0%,100%{opacity:.8}50%{opacity:1;filter:drop-shadow(0 0 12px #ffd34d)}}
+@keyframes fhqs-dragon-soar{0%{transform:translateY(0) scale(1) rotateX(0) rotateY(0)}25%{transform:translateY(-6vh) scale(1.08) rotateX(-6deg) rotateY(20deg)}60%{opacity:1;transform:translateY(-22vh) scale(1.22) rotateX(-10deg) rotateY(40deg)}100%{opacity:0;transform:translateY(-64vh) scale(1.9) rotateX(-18deg) rotateY(70deg)}}
+@keyframes fhqs-flame-burst{0%{opacity:0;transform:scale(.2)}35%{opacity:1;transform:scale(1.6)}100%{opacity:0;transform:scale(2.8)}}
+@keyframes fhqs-demon-enter{0%{opacity:0;transform:translateY(24vh) scale(.5) rotate(-6deg)}55%{opacity:1}100%{opacity:1;transform:translateY(0) scale(1) rotate(0)}}
+@keyframes fhqs-shadow-breathe{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.08);opacity:1}}
+@keyframes fhqs-hand-grab{0%{transform:translateY(8%) scale(1.05)}50%{transform:translateY(0) scale(.96)}100%{transform:translateY(8%) scale(1.05)}}
+@keyframes fhqs-heart-beat{0%,100%{transform:scale(1)}18%{transform:scale(1.16)}30%{transform:scale(1)}46%{transform:scale(1.1)}60%{transform:scale(1)}}
+@keyframes fhqs-hand-clench{0%{transform:translateY(0) scale(1)}45%{transform:translateY(-2%) scale(.9)}72%{transform:scale(.74) rotate(0)}100%{transform:scale(.8)}}
+@keyframes fhqs-heart-crush{0%{transform:scale(1);filter:drop-shadow(0 0 14px #ff4c4c)}40%{transform:scale(.84) rotate(7deg);filter:drop-shadow(0 0 30px #ff2525)}70%{transform:scale(.3) rotate(-12deg)}100%{transform:scale(0);opacity:0}}
+@keyframes fhqs-shards-explode{0%{opacity:0;transform:scale(.2)}18%{opacity:1}100%{opacity:0;transform:scale(2.6) rotate(40deg)}}
+.fhqs-root.fhqs-shake-root{animation:fhqs-shake .5s cubic-bezier(.36,.07,.19,.97) both}
+@media (prefers-reduced-motion:reduce){.fhqs-spectacle{display:none}.fhqs-spec-cv{display:none}}
 @keyframes fhqs-veil-in{to{opacity:1}}
 @keyframes fhqs-veil-out{from{opacity:1}to{opacity:0}}`,
 
-    `.fhqs-stage{position:relative;display:flex;flex-direction:column;align-items:center;
+    `.fhqs-stage{position:relative;z-index:5;display:flex;flex-direction:column;align-items:center;
 padding:0 18px;max-width:min(560px,92vw);will-change:transform,opacity;opacity:0;
 transform:scale(.86) translateY(14px);animation:fhqs-stage-in .62s cubic-bezier(.16,1.1,.3,1) .06s forwards}
 .fhqs-out .fhqs-stage{animation:fhqs-stage-out .3s ease-in forwards}
@@ -165,6 +251,8 @@ background:linear-gradient(140deg,rgba(var(--td),.5),rgba(8,7,12,.86));
 border:1px solid rgba(var(--t),.34);box-shadow:0 8px 30px rgba(0,0,0,.5),
 inset 0 1px 0 rgba(var(--tl),.16);opacity:0;transform:scale(.72);filter:blur(6px)}
 .fhqs-done .fhqs-badge{animation:fhqs-stamp .52s cubic-bezier(.18,1.3,.32,1) forwards}
+.fhqs-rank-mode .fhqs-done .fhqs-badge{animation:fhqs-rank-badge .86s cubic-bezier(.16,1.25,.3,1) .08s forwards}
+@keyframes fhqs-rank-badge{0%{opacity:0;transform:translateY(92px) scale(.38) rotate(-9deg);filter:blur(10px)}58%{opacity:1;transform:translateY(-10px) scale(1.1) rotate(2deg);filter:blur(0)}100%{opacity:1;transform:translateY(0) scale(1) rotate(0);filter:blur(0)}}
 @keyframes fhqs-stamp{to{opacity:1;transform:scale(1);filter:blur(0)}}
 .fhqs-badge::after{content:"";position:absolute;inset:0;pointer-events:none;
 background:linear-gradient(105deg,transparent 34%,rgba(255,255,255,.26) 50%,transparent 66%);
@@ -377,6 +465,167 @@ animation-delay:0s!important;transition-duration:.01ms!important}
       }
     };
   }
+  /* ================= 段位奇观粒子引擎 ================= */
+  function createSpectacleFX(canvas, quality, tone, kind) {
+    const ctx = canvas.getContext("2d", { alpha: true });
+    if (!ctx) return null;
+    const k = quality >= 2 ? 1 : 0.55;
+    const C = kind === "demon"
+      ? ["255,90,72", "255,150,120", "255,40,56", "255,200,190", "120,20,30"]
+      : ["255,240,190", "255,205,120", "255,150,70", "255,255,250", "255,180,70"];
+    const pick = () => C[(Math.random() * C.length) | 0];
+    const rnd = (a, b) => a + Math.random() * (b - a);
+    let embers = [], coil = [], beam = [], rings = [], shards = [], ash = [];
+    let W = 0, H = 0, dpr = 1, cx = 0, cy = 0, raf = 0, last = 0, dead = false, ambient = false;
+    const trails = quality >= 2;
+    const CAP = quality >= 2 ? 760 : 380;
+
+    function resize() {
+      dpr = Math.min(window.devicePixelRatio || 1, quality >= 2 ? 2 : 1.5);
+      W = canvas.clientWidth || window.innerWidth;
+      H = canvas.clientHeight || window.innerHeight;
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    function center(x, y) { cx = x; cy = y; }
+    function trim(a) { if (a.length > CAP) a.splice(0, a.length - CAP); }
+
+    function spawnAmbient(dt) {
+      const nc = (kind === "demon" ? 3 : 4) * k * (dt * 60);
+      for (let i = 0; i < nc; i++) {
+        const a = rnd(0, 6.2832), r = rnd(40, Math.min(W, H) * 0.34);
+        coil.push({ a, r, vr: (kind === "demon" ? -1 : 1) * rnd(0.6, 1.4), t: 0, life: rnd(0.7, 1.6), size: rnd(1, 2.6), c: pick() });
+      }
+      trim(coil);
+      const ne = (kind === "demon" ? 2 : 3) * k * (dt * 60);
+      for (let i = 0; i < ne; i++) {
+        embers.push({
+          x: cx + rnd(-W * 0.18, W * 0.18), y: cy + rnd(-H * 0.12, H * 0.2),
+          vx: rnd(-12, 12), vy: (kind === "demon" ? rnd(-30, -8) : rnd(-46, -14)),
+          t: 0, life: rnd(1.1, 2.4), size: rnd(1, 2.8), c: pick(), flick: rnd(2, 6)
+        });
+      }
+      trim(embers);
+      if (kind === "demon") {
+        const na = 1.4 * k * (dt * 60);
+        for (let i = 0; i < na; i++) {
+          ash.push({ x: cx + rnd(-W * 0.2, W * 0.2), y: cy + rnd(0, H * 0.25),
+            vx: rnd(-20, 20), vy: rnd(-10, 18), t: 0, life: rnd(1.4, 3), size: rnd(8, 22), c: "40,12,16" });
+        }
+        trim(ash);
+      }
+    }
+    function ring(r0, r1, a0, col) { rings.push({ r0, r1, a0, t: 0, life: kind === "demon" ? 0.85 : 1.0, col: col || C[2] }); }
+
+    function launch() {
+      ring(20, Math.max(W, H) * 0.55, 0.5, C[1]);
+      ring(10, Math.max(W, H) * 0.42, 0.42, C[0]);
+      const nb = Math.round(170 * k);
+      for (let i = 0; i < nb; i++) {
+        beam.push({
+          x: cx + rnd(-60, 60), y: cy + rnd(-30, 30),
+          vx: rnd(-26, 26), vy: -rnd(320, 920),
+          t: 0, life: rnd(0.5, 1.1), size: rnd(1.2, 3), c: pick()
+        });
+      }
+      trim(beam);
+      const ne = Math.round(130 * k);
+      for (let i = 0; i < ne; i++) {
+        const a = rnd(-Math.PI * 0.9, -Math.PI * 0.1), sp = rnd(120, 640);
+        embers.push({ x: cx, y: cy, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, t: 0, life: rnd(0.7, 1.6), size: rnd(1.4, 3.4), c: pick(), flick: rnd(2, 6) });
+      }
+      trim(embers);
+    }
+    function crush() {
+      ring(20, Math.max(W, H) * 0.5, 0.6, C[2]);
+      ring(10, Math.max(W, H) * 0.38, 0.5, C[0]);
+      const ns = Math.round(90 * k);
+      for (let i = 0; i < ns; i++) {
+        const a = rnd(0, 6.2832), sp = rnd(160, 580);
+        shards.push({ x: cx, y: cy, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 60, rot: rnd(0, 6.28), vr: rnd(-8, 8), t: 0, life: rnd(0.6, 1.2), size: rnd(4, 12), c: pick() });
+      }
+      trim(shards);
+      const ne = Math.round(130 * k);
+      for (let i = 0; i < ne; i++) {
+        const a = rnd(0, 6.2832), sp = rnd(120, 560);
+        embers.push({ x: cx, y: cy, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, t: 0, life: rnd(0.6, 1.4), size: rnd(1.2, 3), c: pick(), flick: rnd(2, 6) });
+      }
+      trim(embers);
+    }
+
+    function step(ts) {
+      if (dead) return;
+      raf = requestAnimationFrame(step);
+      const dt = last ? Math.min((ts - last) / 1000, 0.05) : 0.016;
+      last = ts;
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.fillStyle = "rgba(0,0,0," + (trails ? 0.16 : 0.3) + ")";
+      ctx.fillRect(0, 0, W, H);
+      ctx.globalCompositeOperation = "lighter";
+
+      if (ambient) spawnAmbient(dt);
+
+      for (let i = rings.length - 1; i >= 0; i--) {
+        const p = rings[i]; p.t += dt;
+        const u = p.t / p.life; if (u >= 1) { rings.splice(i, 1); continue; }
+        const e = easeOutCubic(u);
+        ctx.strokeStyle = "rgba(" + p.col + "," + (1 - u) * 0.85 + ")";
+        ctx.lineWidth = (1 - u) * 6 + 1;
+        ctx.beginPath(); ctx.arc(cx, cy, p.r0 + (p.r1 - p.r0) * e, 0, 6.2832); ctx.stroke();
+      }
+      for (let i = coil.length - 1; i >= 0; i--) {
+        const p = coil[i]; p.t += dt; if (p.t >= p.life) { coil.splice(i, 1); continue; }
+        p.a += p.vr * dt;
+        const x = cx + Math.cos(p.a) * p.r, y = cy + Math.sin(p.a) * p.r;
+        ctx.globalAlpha = Math.sin(p.t / p.life * Math.PI) * 0.9;
+        ctx.fillStyle = "rgba(" + p.c + ",1)";
+        ctx.beginPath(); ctx.arc(x, y, p.size * (1 - p.t / p.life * 0.3), 0, 6.2832); ctx.fill();
+      }
+      for (let i = beam.length - 1; i >= 0; i--) {
+        const p = beam[i]; p.t += dt; if (p.t >= p.life) { beam.splice(i, 1); continue; }
+        p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 60 * dt;
+        ctx.globalAlpha = 1 - p.t / p.life;
+        ctx.strokeStyle = "rgba(" + p.c + ",1)";
+        ctx.lineWidth = p.size * (1 - p.t / p.life * 0.5);
+        ctx.lineCap = "round";
+        ctx.beginPath(); ctx.moveTo(p.x, p.y);
+        ctx.lineTo(p.x - p.vx * 0.03, p.y - p.vy * 0.03); ctx.stroke();
+      }
+      for (let i = embers.length - 1; i >= 0; i--) {
+        const p = embers[i]; p.t += dt; if (p.t >= p.life) { embers.splice(i, 1); continue; }
+        p.x += p.vx * dt; p.y += p.vy * dt; p.vy += (kind === "demon" ? -4 : 30) * dt;
+        ctx.globalAlpha = Math.max(0, (1 - p.t / p.life) * (0.7 + 0.3 * Math.sin(p.t * p.flick)));
+        ctx.fillStyle = "rgba(" + p.c + ",1)";
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.size * (1 - p.t / p.life * 0.4), 0, 6.2832); ctx.fill();
+      }
+      for (let i = shards.length - 1; i >= 0; i--) {
+        const p = shards[i]; p.t += dt; if (p.t >= p.life) { shards.splice(i, 1); continue; }
+        p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 120 * dt; p.rot += p.vr * dt;
+        ctx.globalAlpha = 1 - p.t / p.life;
+        ctx.fillStyle = "rgba(" + p.c + ",1)";
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+        ctx.beginPath(); ctx.moveTo(0, -p.size); ctx.lineTo(p.size * 0.7, p.size); ctx.lineTo(-p.size * 0.7, p.size); ctx.closePath(); ctx.fill();
+        ctx.restore();
+      }
+      ctx.globalCompositeOperation = "source-over";
+      for (let i = ash.length - 1; i >= 0; i--) {
+        const p = ash[i]; p.t += dt; if (p.t >= p.life) { ash.splice(i, 1); continue; }
+        p.x += p.vx * dt; p.y += p.vy * dt;
+        ctx.globalAlpha = (1 - p.t / p.life) * 0.25;
+        ctx.fillStyle = "rgba(" + p.c + ",1)";
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.size * (0.6 + p.t / p.life), 0, 6.2832); ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    resize();
+    raf = requestAnimationFrame(step);
+    return {
+      resize, center, beginAmbient() { ambient = true; }, launch, crush,
+      stop() { dead = true; if (raf) cancelAnimationFrame(raf), raf = 0; embers = coil = beam = rings = shards = ash = []; }
+    };
+  }
   /* ================= 配置参数 ================= */
   const DEF = {
     score: 0,            // 目标分数
@@ -419,7 +668,9 @@ animation-delay:0s!important;transition-duration:.01ms!important}
   const R = 152, VB = 340, CIRC = 2 * Math.PI * R;
   function buildDOM(o, tone, quality) {
     const root = document.createElement("div");
-    root.className = "fhqs-root fhqs-q" + quality;
+    const delta = Number(o.delta || 0);
+    const rankState = o.rankMode ? (delta > 0 ? " fhqs-rank-rise" : (delta < 0 ? " fhqs-rank-drop" : " fhqs-rank-stable")) : "";
+    root.className = "fhqs-root fhqs-q" + quality + (o.rankMode ? " fhqs-rank-mode" : "") + rankState;
     root.style.setProperty("--t", tone.base);
     root.style.setProperty("--tl", tone.lite);
     root.style.setProperty("--td", tone.deep);
@@ -448,6 +699,78 @@ animation-delay:0s!important;transition-duration:.01ms!important}
       `<div class="fhqs-veil"></div>` +
       `<canvas class="fhqs-cv"></canvas>` +
       `<div class="fhqs-flash"></div>` +
+      (o.rankEvent ? `<canvas class="fhqs-spec-cv"></canvas>` : "") +
+      (o.rankEvent === "promotion" ? `<div class="fhqs-spectacle fhqs-rank-promotion" aria-hidden="true">
+        <div class="fhqs-spec-rays"></div>
+        <svg class="fhqs-dragon" viewBox="0 0 600 600">
+          <defs>
+            <linearGradient id="fhqDragonGold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff3a0"/><stop offset=".4" stop-color="#f6b53a"/><stop offset="1" stop-color="#7c2a0e"/></linearGradient>
+            <linearGradient id="fhqDragonBelly" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff0c0"/><stop offset="1" stop-color="#e9a23a"/></linearGradient>
+            <linearGradient id="fhqDragonWing" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffe58a" stop-opacity=".92"/><stop offset="1" stop-color="#b83b18" stop-opacity=".12"/></linearGradient>
+            <radialGradient id="fhqDragonAura"><stop stop-color="#ffd86b" stop-opacity=".5"/><stop offset=".6" stop-color="#ff9b2e" stop-opacity=".15"/><stop offset="1" stop-color="#ff7a18" stop-opacity="0"/></radialGradient>
+            <radialGradient id="fhqDragonEye"><stop stop-color="#fff"/><stop offset=".3" stop-color="#ffe75c"/><stop offset="1" stop-color="#ff4b18"/></radialGradient>
+          </defs>
+          <circle cx="300" cy="330" r="250" fill="url(#fhqDragonAura)"/>
+          <g class="fhqs-dragon-flame"><path d="M300 470 C262 524 312 524 288 566 C360 520 336 498 350 462Z" fill="#ff7a18" opacity=".9"/><path d="M308 474 C292 516 322 510 314 544 C352 508 332 492 336 472Z" fill="#fff1a0"/></g>
+          <g class="fhqs-dragon-body">
+            <path class="fhqs-dragon-wing back" d="M312 300 C200 190 96 196 40 120 C150 130 244 150 340 244 C262 120 268 64 300 30 C330 116 372 168 372 268Z" fill="url(#fhqDragonWing)" stroke="#ffbd48" stroke-width="5"/>
+            <path class="fhqs-dragon-wing" d="M288 300 C400 190 504 196 560 120 C450 130 356 150 260 244 C338 120 332 64 300 30 C270 116 228 168 228 268Z" fill="url(#fhqDragonWing)" stroke="#ffbd48" stroke-width="5"/>
+            <g class="fhqs-dragon-tail">
+              <path d="M300 196 C250 232 232 320 262 392 C282 432 278 470 300 506 C322 470 318 432 338 392 C368 320 350 232 300 196Z" fill="url(#fhqDragonGold)" stroke="#ffdd70" stroke-width="6"/>
+              <path d="M262 240 L224 184 L276 206 L300 162 L324 206 L376 184 L338 240 L324 296 L276 296Z" fill="#b84319" stroke="#ffdc71" stroke-width="5"/>
+            </g>
+            <path d="M300 150 C246 188 226 270 258 350 C277 398 273 446 300 492 C327 446 323 398 342 350 C374 270 354 188 300 150Z" fill="url(#fhqDragonGold)" stroke="#ffdd70" stroke-width="7"/>
+            <path d="M300 180 C272 210 262 280 282 348 C295 386 295 430 300 470 C305 430 305 386 318 348 C338 280 328 210 300 180Z" fill="url(#fhqDragonBelly)" opacity=".6"/>
+            <path d="M300 168 C268 196 256 256 276 318 M300 200 C330 230 342 290 322 350 M300 240 C270 268 260 320 282 376" fill="none" stroke="#9c3411" stroke-width="5" stroke-linecap="round" opacity=".6"/>
+            <path d="M250 300 C206 326 172 320 140 348 C190 356 232 378 270 360 M350 300 C394 326 428 320 460 348 C410 356 368 378 330 360" fill="none" stroke="#ffb63e" stroke-width="13" stroke-linecap="round"/>
+            <g>
+              <path d="M300 96 C256 120 246 176 274 214 C292 238 308 238 326 214 C354 176 344 120 300 96Z" fill="url(#fhqDragonGold)" stroke="#ffdd70" stroke-width="7"/>
+              <path d="M276 104 C262 64 244 52 226 40 C256 64 268 86 286 110Z" fill="#b84319" stroke="#ffdc71" stroke-width="4"/>
+              <path d="M324 104 C338 64 356 52 374 40 C344 64 332 86 314 110Z" fill="#b84319" stroke="#ffdc71" stroke-width="4"/>
+              <path d="M276 176 C268 196 286 206 300 206 C314 206 332 196 324 176Z" fill="#c9541d" stroke="#ffdc71" stroke-width="4"/>
+              <path d="M286 186 C250 196 224 214 206 242" fill="none" stroke="#ffdd70" stroke-width="4" stroke-linecap="round"/>
+              <path d="M314 186 C350 196 376 214 394 242" fill="none" stroke="#ffdd70" stroke-width="4" stroke-linecap="round"/>
+              <circle class="fhqs-dragon-eye" cx="282" cy="150" r="11" fill="url(#fhqDragonEye)"/>
+              <circle class="fhqs-dragon-eye" cx="318" cy="150" r="11" fill="url(#fhqDragonEye)"/>
+              <path d="M288 198 l6 14 6 -14 M306 198 l6 14 6 -14" fill="#fff" stroke="#ffdc71" stroke-width="2"/>
+            </g>
+          </g>
+        </svg>
+      </div>` : "") +
+      (o.rankEvent === "demotion" ? `<div class="fhqs-spectacle fhqs-rank-demotion" aria-hidden="true">
+        <div class="fhqs-spec-rays"></div>
+        <svg class="fhqs-demon" viewBox="0 0 600 600">
+          <defs>
+            <radialGradient id="fhqDemonHeart"><stop stop-color="#ffb0a1"/><stop offset=".35" stop-color="#e52f45"/><stop offset="1" stop-color="#5d0719"/></radialGradient>
+            <linearGradient id="fhqDemonHand" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#5b1728"/><stop offset=".5" stop-color="#d34848"/><stop offset="1" stop-color="#260711"/></linearGradient>
+            <radialGradient id="fhqDemonAura"><stop stop-color="#7a1020" stop-opacity=".55"/><stop offset=".6" stop-color="#3a0a14" stop-opacity=".2"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+            <radialGradient id="fhqDemonEye"><stop stop-color="#fff"/><stop offset=".3" stop-color="#ffd24a"/><stop offset="1" stop-color="#ff2a2a"/></radialGradient>
+          </defs>
+          <circle class="fhqs-demon-shadow" cx="300" cy="340" r="260" fill="url(#fhqDemonAura)"/>
+          <g class="fhqs-demon-shards" fill="#ff4d55">
+            <path d="M300 300 l-90 -110 116 74Z"/><path d="M300 320 l110 -100 -64 124Z"/><path d="M280 330 l-128 44 116 -70Z"/><path d="M320 330 l128 54 -134 -26Z"/><path d="M300 250 l-40 -120 70 96Z"/>
+          </g>
+          <g>
+            <path d="M120 600 C140 470 210 430 300 430 C390 430 460 470 480 600Z" fill="url(#fhqDemonHand)" stroke="#ff6b62" stroke-width="6"/>
+            <path d="M210 300 C210 230 250 196 300 196 C350 196 390 230 390 300 C390 360 350 392 300 392 C250 392 210 360 210 300Z" fill="#3a0c16" stroke="#ff6b62" stroke-width="5"/>
+            <path d="M236 232 C212 180 196 168 176 150 C214 178 232 210 248 250Z" fill="#5b1728" stroke="#ff7a6a" stroke-width="4"/>
+            <path d="M364 232 C388 180 404 168 424 150 C386 178 368 210 352 250Z" fill="#5b1728" stroke="#ff7a6a" stroke-width="4"/>
+            <ellipse class="fhqs-demon-eye" cx="262" cy="290" rx="22" ry="14" fill="url(#fhqDemonEye)"/>
+            <ellipse class="fhqs-demon-eye" cx="338" cy="290" rx="22" ry="14" fill="url(#fhqDemonEye)"/>
+            <path d="M238 262 C256 250 282 252 296 264 M364 262 C346 250 320 252 304 264" fill="none" stroke="#ff6b62" stroke-width="6" stroke-linecap="round"/>
+            <path d="M262 346 C282 360 318 360 338 346" fill="none" stroke="#ff6b62" stroke-width="5" stroke-linecap="round"/>
+            <path d="M276 348 l8 18 8 -18 M308 348 l8 18 8 -18" fill="#fff" stroke="#ff8a7a" stroke-width="2"/>
+          </g>
+          <path class="fhqs-demon-heart" d="M300 300 C246 250 194 298 224 348 C244 381 280 400 300 428 C320 400 356 381 376 348 C406 298 354 250 300 300Z" fill="url(#fhqDemonHeart)" stroke="#ff7474" stroke-width="7"/>
+          <path class="fhqs-demon-heart" d="M300 312 C292 340 300 360 300 392 M270 330 C284 344 290 360 286 380 M330 330 C316 344 310 360 314 380" fill="none" stroke="#ff8a8a" stroke-width="3" opacity=".7"/>
+          <g class="fhqs-demon-hand" fill="url(#fhqDemonHand)" stroke="#ff6b62" stroke-width="5" stroke-linejoin="round">
+            <path d="M150 250 C176 220 206 236 214 272 L238 360 L262 286 C272 250 304 258 296 296 L274 388 L308 312 C320 280 350 296 336 330 L300 396 C280 432 236 444 200 420 L150 378 C116 352 100 308 110 276Z"/>
+            <path d="M450 250 C424 220 394 236 386 272 L362 360 L338 286 C328 250 296 258 304 296 L326 388 L292 312 C280 280 250 296 264 330 L300 396 C320 432 364 444 400 420 L450 378 C484 352 500 308 490 276Z"/>
+          </g>
+        </svg>
+      </div>` : "") +
+      (o.rankMode && delta > 0 ? `<div class="fhqs-rush" aria-hidden="true"></div>` : "") +
+      (o.rankMode && delta < 0 ? `<div class="fhqs-cracks" aria-hidden="true"></div>` : "") +
       `<div class="fhqs-stage">` +
       (o.kicker ? `<div class="fhqs-kicker">${esc(o.kicker)}</div>` : "") +
       `<div class="fhqs-ring">
@@ -508,6 +831,12 @@ animation-delay:0s!important;transition-duration:.01ms!important}
     const valEl = $(".fhqs-val"), deltaEl = $(".fhqs-delta"), closeBtn = $(".fhqs-close");
     const prevFocus = document.activeElement;
 
+    const specCv = $(".fhqs-spec-cv");
+    let specFX = null;
+    if (specCv && quality > 0 && (o.rankEvent === "promotion" || o.rankEvent === "demotion")) {
+      specFX = createSpectacleFX(specCv, quality, tone, o.rankEvent === "promotion" ? "dragon" : "demon");
+    }
+
     let fx = quality > 0 ? createFX(cv, quality, tone) : null;
     let timers = [], raf = 0, done = false, settled = false, resolveFn = null;
     const at = (ms, fn) => timers.push(setTimeout(fn, reduced ? Math.min(ms, 16) : ms));
@@ -544,6 +873,7 @@ animation-delay:0s!important;transition-duration:.01ms!important}
         at(460, () => stage.classList.remove("fhqs-shake"));
       }
       root.classList.add("fhqs-lit");
+      if (specFX) { specFX.center(window.innerWidth / 2, window.innerHeight * 0.55); specFX.beginAmbient(); }
       startCount();
     });
 
@@ -590,7 +920,13 @@ animation-delay:0s!important;transition-duration:.01ms!important}
         }
       }
       if (fx) { const m = metrics(); fx.center(m.x, m.y); fx.burst(m.r); fx.flare(m.r); fx.ambient(m.r); }
-      pulse(.72);
+      if (specFX) {
+        if (o.rankEvent === "promotion") { root.classList.add("fhqs-soar"); specFX.launch(); }
+        else if (o.rankEvent === "demotion") { root.classList.add("fhqs-crush"); specFX.crush(); }
+        root.classList.add("fhqs-shake-root");
+        at(reduced ? 30 : 520, () => root.classList.remove("fhqs-shake-root"));
+      }
+      pulse(.9);
 
       const rows = root.querySelectorAll(".fhqs-row");
       rows.forEach((r, i) => at(120 + i * 70, () => {
@@ -620,6 +956,7 @@ animation-delay:0s!important;transition-duration:.01ms!important}
       document.removeEventListener("keydown", onKey, true);
       setTimeout(() => {
         if (fx) fx.stop(), fx = null;
+        if (specFX) specFX.stop(), specFX = null;
         if (root.parentNode) root.parentNode.removeChild(root);
         if (prevFocus && prevFocus.focus) { try { prevFocus.focus({ preventScroll: true }); } catch (e) { } }
       }, reduced ? 20 : 340);
@@ -628,7 +965,7 @@ animation-delay:0s!important;transition-duration:.01ms!important}
       if (resolveFn) resolveFn(reason);
     }
 
-    function onResize() { if (fx) { fx.resize(); const m = metrics(); fx.center(m.x, m.y); } }
+    function onResize() { if (fx) { fx.resize(); const m = metrics(); fx.center(m.x, m.y); } if (specFX) { specFX.resize(); specFX.center(window.innerWidth / 2, window.innerHeight * 0.55); } }
     function onKey(e) {
       if (e.key === "Escape" || e.key === "Esc") {
         e.stopPropagation();
@@ -672,15 +1009,38 @@ animation-delay:0s!important;transition-duration:.01ms!important}
       const sc = match[side], t = sc.tier || {};
       const L = { kill: "击杀", survive: "生存", strategy: "战略", resource: "资源", offense: "进攻", discipline: "纪律" };
       const MAXD = { kill: 4, survive: 3.2, strategy: 3.2, resource: 2.4, offense: 1.6, discipline: 1.6 };
+      const tierText = score => {
+        if (score >= 1600) return "S+";
+        if (score >= 1300) return "S";
+        if (score >= 1000) return "A";
+        if (score >= 700) return "B";
+        if (score >= 450) return "C";
+        if (score >= 200) return "D";
+        return "E";
+      };
+      const delta = Number(extra && extra.delta != null ? extra.delta : (sc.elo != null ? sc.elo : 0));
+      const before = Number(extra && extra.scoreBefore != null ? extra.scoreBefore : (sc.rating != null ? sc.rating : 0));
+      const after = Number(extra && extra.scoreAfter != null ? extra.scoreAfter : (sc.rating != null ? sc.rating : 0));
+      const beforeTier = extra && (extra.tierBefore || extra.tierBeforeText) ? (extra.tierBefore || extra.tierBeforeText) : tierText(before);
+      const afterTier = extra && (extra.tierAfter || extra.tierAfterText) ? (extra.tierAfter || extra.tierAfterText) : tierText(after);
+      const trend = delta > 0 ? "晋升" : (delta < 0 ? "掉段" : "稳定");
+      const kicker = extra && extra.resultLabel ? extra.resultLabel : (delta > 0 ? "段位提升" : (delta < 0 ? "段位下降" : "段位稳定"));
+      const toneKey = delta > 0 ? "gold" : (delta < 0 ? "red" : "blue");
       return show(Object.assign({
-        score: sc.rating, max: 16, decimals: 1,
-        from: 0, delta: sc.elo, deltaSuffix: " 分",
-        kicker: sc.result === "win" ? "对局胜利" : sc.result === "loss" ? "对局失利" : "和棋",
-        result: sc.result, tone: t.color || null,
-        grade: t.grade || "", title: t.title || "", icon: t.icon || "",
-        label: "RATING", sub: sc.percentile ? "超越 " + sc.percentile + "% 的玩家" : "",
+        score: after, max: 2200, decimals: 0,
+        from: before, delta: delta, deltaSuffix: " 分",
+        kicker: kicker,
+        result: delta > 0 ? "win" : (delta < 0 ? "loss" : "draw"), tone: toneKey,
+        grade: afterTier || (t.grade || ""), title: (afterTier ? afterTier + " 段位" : (t.title || "")),
+        icon: extra && extra.icon ? extra.icon : (delta > 0 ? "▲" : (delta < 0 ? "▼" : "◆")),
+        label: "积分变化",
+        rankMode: true,
+        sub: (beforeTier && afterTier) ? (
+          beforeTier + " " + before + " → " + afterTier + " " + after
+        ) : (sc.percentile ? "超越 " + sc.percentile + "% 的玩家" : ""),
         rows: Object.keys(sc.breakdown || {}).map(k =>
           ({ label: L[k] || k, value: sc.breakdown[k], max: MAXD[k] || 4 })),
+        hint: extra && extra.hint ? extra.hint : (trend + " · 这把对局将直接影响你的段位曲线"),
       }, extra || {}));
     },
 

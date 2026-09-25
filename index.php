@@ -66,44 +66,92 @@ function fhqReplaySign($rid, $timestamp = null)
 
 <body>
 
-    <div class="top-bar">大厅</div>
+    <div class="top-bar">
+        <div class="top-bar-inner">
+            <div class="top-user">
+                <div class="top-avatar">
+                    <?php if ($qx_max_tmp1): ?>
+                        <i class="fa-solid fa-chess-king"></i>
+                    <?php else: ?>
+                        <i class="fa-solid fa-user"></i>
+                    <?php endif; ?>
+                </div>
+                <div class="top-user-meta">
+                    <strong><?php echo htmlspecialchars($qx_max_tmp1 ? ($_COOKIE['mokim_usergname'] ?? getStableName($q_suname)) : $visitor_notlogined_n, ENT_QUOTES); ?></strong>
+                    <span><?php echo $qx_max_tmp1 ? '棋手登场' : '游客入场'; ?></span>
+                </div>
+            </div>
+            <div class="top-title">大厅</div>
+            <div class="top-tools">
+                <div class="currency-pill"><?php echo date('Y-m-d H:i:s'); ?></div>
+                <button class="ghost-icon" onclick="window.open('use/setting/');" aria-label="设置">
+                    <i class="fa-solid fa-gear"></i>
+                </button>
+            </div>
+        </div>
+    </div>
 
     <div class="main-content" id="mainContent">
         <div class="tab-panel active" id="tab-play">
-            <div class="decorations">
-                <i class="fa-solid fa-chess-king"></i>
-                <i class="fa-solid fa-chess-queen"></i>
-                <i class="fa-solid fa-chess-knight"></i>
-            </div>
-            <div class="game-title">
-                <h1>烽火棋</h1>
-                <div class="subtitle">策略 · 博弈 · 智斗</div>
-            </div>
-            <div class="card-container">
-                <div class="button-grid">
-                    <button class="btn btn-danger"
-                        <?php if (!$qx_max_tmp1): ?>
-                        onclick="openModal('系统提示','您当前还没有登录！请先登录或开房间与好友游玩');"
-                        <?php else: ?>
-                        onclick="location.href='ranking.php?d=<?php echo fhqReplaySign($q_suname, $userlogin_expiretime_used); ?>';"
-                        <?php endif; ?>>
-                        <i class="fa-solid fa-chess-board"></i> 排位竞技
-                    </button>
-                    <button class="btn btn-primary" onclick="window.open('localversus.html');">
-                        <i class="fa-solid fa-chess-board"></i> 本地对战
-                    </button>
-                    <button class="btn btn-success" onclick="location.href='tutorial.html';">
-                        <i class="fa-solid fa-graduation-cap"></i> 新手教程
-                    </button>
-                    <button class="btn btn-custom-orange" onclick="location.href='endgame.html';">
-                        <i class="fa-solid fa-puzzle-piece"></i> 残局挑战
-                    </button>
-                    <button class="btn btn-custom-purple" onclick="window.open('bot.html');">
-                        <i class="fa-solid fa-robot"></i> 人机试炼
-                    </button>
-                    <button class="btn btn-custom-teal" onclick="window.open('wtpp.php')">
-                        <i class="fa-solid fa-flag-checkered"></i> 精选对局
-                    </button>
+            <div class="arena-shell">
+                <div class="arena-scene">
+                    <div class="arena-noise"></div>
+                    <div class="arena-glow"></div>
+                    <div class="arena-board">
+                        <div class="board-surface"></div>
+                        <div class="board-piece piece-king">♔</div>
+                        <div class="board-piece piece-queen">♕</div>
+                        <div class="board-piece piece-knight">♘</div>
+                        <div class="board-piece piece-pawn">♟</div>
+                    </div>
+                    <div class="arena-mask"></div>
+                </div>
+
+                <div class="arena-content">
+                    <div class="game-title">
+                        <div class="label-tag">棋坛 · 竞技场</div>
+                        <h1>烽火棋</h1>
+                        <div class="subtitle">策略 · 博弈 · 智斗</div>
+                    </div>
+
+                    <div class="primary-action">
+                        <button class="btn btn-danger hero-rank-btn"
+                            <?php if (!$qx_max_tmp1): ?>
+                            onclick="openModal('系统提示','您当前还没有登录！请先登录或开房间与好友游玩');"
+                            <?php else: ?>
+                            onclick="location.href='ranking.php?d=<?php echo fhqReplaySign($q_suname, $userlogin_expiretime_used); ?>';"
+                            <?php endif; ?>>
+                            <i class="fa-solid fa-chess-board"></i>
+                            <span>排位竞技</span>
+                        </button>
+                    </div>
+
+                    <div class="button-grid primary-grid">
+                        <button class="btn btn-primary" onclick="window.open('localversus.html');">
+                            <i class="fa-solid fa-chess-board"></i> 本地对战
+                        </button>
+                        <button class="btn btn-custom-purple" onclick="window.open('bot.html');">
+                            <i class="fa-solid fa-robot"></i> 人机试炼
+                        </button>
+                        <button class="btn btn-custom-orange" onclick="location.href='endgame.html';">
+                            <i class="fa-solid fa-puzzle-piece"></i> 残局挑战
+                        </button>
+                        <button class="btn btn-success" onclick="location.href='tutorial.html';">
+                            <i class="fa-solid fa-graduation-cap"></i> 新手教程
+                        </button>
+                    </div>
+
+                    <div class="mini-tools">
+                        <button class="tool-btn" onclick="window.open('wtpp.php')">
+                            <i class="fa-solid fa-flag-checkered"></i>
+                        </button>
+                        <button class="tool-btn" onclick="window.open('use/book/fhq/');">
+                            <i class="fa-solid fa-book-open"></i>
+                        </button>
+                        <button class="tool-btn" onclick="window.open('use/book/about/');">
+                            <i class="fa-solid fa-circle-info"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -252,10 +300,10 @@ function fhqReplaySign($rid, $timestamp = null)
         </div>
 
     </div>
-    <nav class="bottom-nav">
+    <div class="floating-dock" aria-label="快速切换区域">
         <button class="nav-item active" data-tab="tab-play" onclick="switchTab('tab-play', this)">
             <i class="fa-solid fa-chess"></i>
-            <span>下棋</span>
+            <span>棋坛</span>
         </button>
         <button class="nav-item" data-tab="tab-battle" onclick="switchTab('tab-battle', this)">
             <i class="fa-solid fa-chess-board"></i>
@@ -263,13 +311,13 @@ function fhqReplaySign($rid, $timestamp = null)
         </button>
         <button class="nav-item" data-tab="tab-rank" onclick="switchTab('tab-rank', this)">
             <i class="fa-solid fa-ranking-star"></i>
-            <span>排行榜</span>
+            <span>榜单</span>
         </button>
         <button class="nav-item" data-tab="tab-me" onclick="switchTab('tab-me', this)">
             <i class="fa-solid fa-user"></i>
             <span>我的</span>
         </button>
-    </nav>
+    </div>
     <div class="modal-overlay" id="myModal">
         <div class="modal-box">
             <div class="modal-title" id="modalTitle">提示</div>
